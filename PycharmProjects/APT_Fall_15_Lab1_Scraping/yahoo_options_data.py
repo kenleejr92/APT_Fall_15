@@ -1,3 +1,6 @@
+#Author: Kenneth Lee (kl22943)
+#APT_2015_Fall
+
 import json
 import sys
 import re

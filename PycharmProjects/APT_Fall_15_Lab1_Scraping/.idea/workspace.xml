@@ -24,10 +24,10 @@
       <file leaf-file-name="yahoo_options_data.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/yahoo_options_data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="7.0212765">
-              <caret line="154" column="73" selection-start-line="154" selection-start-column="73" selection-end-line="154" selection-end-column="73" />
+            <state vertical-scroll-proportion="0.41033435">
+              <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
               <folding>
-                <element signature="e#0#11#0" expanded="true" />
+                <element signature="e#47#58#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -434,7 +434,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#47#58#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -462,7 +462,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#47#58#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -577,10 +577,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/yahoo_options_data.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="7.0212765">
-          <caret line="154" column="73" selection-start-line="154" selection-start-column="73" selection-end-line="154" selection-end-column="73" />
+        <state vertical-scroll-proportion="0.41033435">
+          <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#47#58#0" expanded="true" />
           </folding>
         </state>
       </provider>
