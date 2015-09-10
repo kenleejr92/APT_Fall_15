@@ -6,21 +6,25 @@ from bs4 import BeautifulSoup
 
 
 def contractAsJson(filename):
+  #Current Price
   jsonQuoteData = {}
   fhand = open(filename,"r")
   soup = BeautifulSoup(fhand, 'html.parser')
   h2Tags = soup.findAll('h2')
+  #Find the company appreviation
   for h2 in h2Tags :
     if re.match('.*\((.+)\).*',h2.string) :
       comp = re.findall('.*\((.+)\).*',h2.string)
+      break
   company = comp[0].lower()
+  #Find the price by appending the company name to an id string
   company_id = "yfs_l84_" + company
   priceTag = soup.findAll(id=company_id)
   price = priceTag[0].string
   jsonQuoteData["currPrice"]=float(price)
 
 
-
+  #Expiry URLs
   table = soup.find(id="yfncsumtab") #get tag of table
   tableCells = table.findAll("td") #tags of table cells
   #find the tag that has the string corresponding to expirations
@@ -33,12 +37,13 @@ def contractAsJson(filename):
   exp_urls = []
   for a in exp_links :
     if re.match('.*m=20[0-9][0-9]-[0|1][0-9].*',a['href']) :
-      exp_urls.append("http://finance.yahoo.com"+a['href'])
+      exp_urls.append("http://finance.yahoo.com"+a['href'].replace("&","&amp;"))
   jsonQuoteData["dateUrls"]= exp_urls
 
 
   #Call Options
   optionQuotes = []
+  #find the table of options
   bTitles = exp_date_list.findAll('b')
   for b in bTitles :
     if re.match("^Call Options$",b.text) :
@@ -50,9 +55,11 @@ def contractAsJson(filename):
   dataTable = titleTable.next_sibling
   dataTable = dataTable.findAll('table')
   keys = []
+  #Iterate through table rows
   for tr in dataTable[0].findAll('tr') :
     oQ={}
     if re.match('.*Strike.*',tr.text) :
+      #Assemble the key value list in order of discovery
       for th in tr.findAll('th') :
         if th.text == 'Chg':
           keys.append('Change')
@@ -63,8 +70,10 @@ def contractAsJson(filename):
       continue
     else :
       i = 0
+      #Iterate through table columns
       for td in tr.findAll('td') :
         if keys[i] == 'Symbol' :
+           #Extract symbol, date, and time
            symbolDateType = re.findall('^[a-zA-Z]+[0-9]+[a-zA-Z]', td.text)[0]
            type = re.findall('.*([a-zA-Z])$',symbolDateType)[0]
            date = re.findall('.*([0-9]{6})[a-zA-Z]$',symbolDateType)[0]
@@ -73,6 +82,7 @@ def contractAsJson(filename):
            oQ['Date'] = date
            oQ['Type'] = type
         elif keys[i] == 'Change':
+          #Use class id to determine positive or negative change
           img = td.findAll('img')
           if len(img) > 0 :
             if img[0]['class'][0] == 'pos_arrow' :
@@ -89,6 +99,7 @@ def contractAsJson(filename):
 
 
   #Put Options
+  #Perform the same as above for Put Options
   bTitles = exp_date_list.findAll('b')
   for b in bTitles :
     if re.match("^Put Options$",b.text) :
@@ -139,14 +150,9 @@ def contractAsJson(filename):
 
   def deleteComma(x) :
     interest = x['Open']
-    beforeComma = re.findall('^([0-9]+),', interest)
-    if len(beforeComma) > 0 :
-        afterComma = re.findall('^[0-9]+,([0-9]+).*',interest)
-        return int(beforeComma[0] + afterComma[0])
-    else :
-        noComma = re.findall('^[0-9]*', interest)
-        return int(noComma[0])
+    return int(interest.replace(",",""))
 
+  #Sort by open interest, and break ties with order of appearance on page
   def sortingFunc(x,y) :
     if deleteComma(x) != deleteComma(y) :
       return cmp(deleteComma(x),deleteComma(y))
