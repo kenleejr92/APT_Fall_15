@@ -1,0 +1,29 @@
+import java.net.*;
+import java.io.*;
+
+public class Server {
+
+	/**
+	 * @param args
+	 */
+	public static InetAddress localhost;
+	public static ServerSocket a;
+	public static Socket b;
+	public static void main(String[] args) {
+		try{
+			localhost = InetAddress.getLocalHost();
+			System.out.println(localhost);
+			a = new ServerSocket(1600);
+			
+			
+		} catch(UnknownHostException e){
+			System.err.println(e);
+		} catch (IOException e) {
+			System.err.println(e);
+		}
+
+	}
+
+}
+
+

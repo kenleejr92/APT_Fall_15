@@ -1,0 +1,23 @@
+import java.io.*;
+import java.util.*;
+
+public class OtherServers {
+	private ServerID[] servers;
+	
+	public void OtherServers(String filename){
+		try{
+			BufferedReader in = new BufferedReader(new FileReader(filename));
+			
+		}catch(FileNotFoundException e)
+		{
+			System.out.println(e);
+		}catch(IOException e)
+		{
+			System.out.println(e);
+		}
+	}
+	
+	public ServerID[] getServerIDs(){
+		return servers;
+	}
+}

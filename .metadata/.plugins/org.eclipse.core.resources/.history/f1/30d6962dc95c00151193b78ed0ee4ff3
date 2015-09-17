@@ -1,0 +1,33 @@
+import java.io.*;
+import java.util.*;
+
+public class OtherServers {
+	private ServerID[] servers;
+	
+	public void OtherServers(String filename){
+		try{
+			BufferedReader in = new BufferedReader(new FileReader(filename));
+			int i=0;
+			while(true)
+			{
+				String line = in.readLine();
+				StringTokenizer st = new StringTokenizer(line);
+				while(st.hasMoreTokens()){
+					String IP = st.nextToken();
+					Integer portNum = Integer.parseInt(st.nextToken());
+					ServerID[i++]=new ServerID(IP,portNum);
+				}
+			}
+		}catch(FileNotFoundException e)
+		{
+			System.out.println(e);
+		}catch(IOException e)
+		{
+			System.out.println(e);
+		}
+	}
+	
+	public ServerID[] getServerIDs(){
+		return servers;
+	}
+}

@@ -1,0 +1,21 @@
+import java.net.*;
+import java.io.*;
+
+public class Server {
+
+	/**
+	 * @param args
+	 */
+	public static InetAddress localhost;
+	public static void main(String[] args) {
+		try{
+			localhost = InetAddress.getLocalHost();
+			System.out.println(localhost);
+			
+		} catch(UnknownHostException e){
+			System.err.println(e);
+		}
+
+	}
+
+}
