@@ -38,4 +38,7 @@ public class OtherServers {
 	public ServerID[] getServerIDs(){
 		return servers;
 	}
+	public Integer getNumServers(){
+		return numServers;
+	}
 }

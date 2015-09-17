@@ -2,38 +2,41 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 
+
 public class Server {
 
 	/**
 	 * @param args
 	 */
-	public static InetAddress loopBackAddress;
-	private InetAddress serverIP;
-	private int serverPort;
-	public static ServerSocket a;
-	public static Socket b,c;
+	public static Integer serverID;
+	public static Integer numServers;
+	public static ServerID[] otherServers;
 	public static OtherServers o;
+	public static Linker l;
 	
-	public static void main(String[] args) {
-		try{
-			loopBackAddress = InetAddress.getLoopbackAddress();
-			a = new ServerSocket(1600, 0, loopBackAddress);
-			b = new Socket(loopBackAddress, 1600);
-			Socket client = a.accept();
-			PrintWriter out = new PrintWriter(b.getOutputStream(), true);
-			out.println("Hello server");
-			BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-			System.out.println(in.readLine());
-			a.close();
-			b.close();
-			client.close();
-			o = new OtherServers("servers.txt");
+	public static void main(String[] args) throws Exception {
+		if(args.length > 1 || args.length == 0){
+			System.out.println("Incorrect Arguments");
 			System.exit(0);
-		} catch(UnknownHostException e){
-			System.err.println(e);
-		
-		} catch (IOException e) {
-			System.err.println(e);
+		}else{
+			serverID = Integer.parseInt(args[0]);
+		}
+		try{
+			o = new OtherServers("servers.txt");
+			otherServers = o.getServerIDs();
+			numServers = o.getNumServers();
+			l = new Linker(otherServers,serverID,numServers);
+			l.multicast("Hello", "MultiCast");
+			for(int i=0; i<serverID; i++){
+				int s = serverID;
+				if(i!=s){
+					l.receiveMsg(i);
+				}
+			}
+			Thread.sleep(5000);
+			l.close();
+		} catch(IOException e){
+			System.out.println(e);
 		}
 
 	}
