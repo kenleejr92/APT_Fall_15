@@ -10,5 +10,11 @@ public class ServerID {
 			IP = ip;
 			portNum = port;
 		}
+	
+		public boolean equals(ServerID sid){
+			if(sid.IP.equals(this.IP) && sid.portNum.equals(this.portNum)){
+				return true;
+			}else return false;
+		}
 
 }

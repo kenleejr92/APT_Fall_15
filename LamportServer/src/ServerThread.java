@@ -5,34 +5,38 @@ import java.net.*;
 public class ServerThread extends Thread  {
 	private Thread t;
 	private BufferedReader dataIn;
-	//private Socket socket;
+	private PrintWriter dataOut;
+	private Socket socket;
+	private int myId;
 	private int listeningID;
-	private boolean r = true;
+	private boolean timeout;
 	
-	ServerThread(BufferedReader in, int id){
+	ServerThread(BufferedReader in, PrintWriter out, int lId, int mId, ThreadGroup tg){
+		super(tg, "Thread x");
 		dataIn = in;
-		//socket = socket_in;
-		listeningID = id;
+		dataOut = out;
+		listeningID = lId;
+		myId = mId;
+		timeout = false;
 	}
 	
 	public void run() {
-		while(r){
-			System.out.println("Runnin...");
+		while(!timeout){
 			try {
+				dataOut.println("Hello From " + Integer.toString(myId));
+				dataOut.flush();
 				String line = dataIn.readLine();
 				System.out.println(line);
+				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				r = false;
-				t.interrupt();
-				//e.printStackTrace();
-			}
+				timeout = true;
+				System.out.println("Timeout");
+			} 
 		}
-		t.interrupt();
 	}
 	
 	public void start() {
-		System.out.println("Starting thread server listening to: " + Integer.toString(listeningID));
+		System.out.println("Server " + Integer.toString(myId)+ " listening to " + Integer.toString(listeningID));
 		if(t==null){
 			t = new Thread (this, Integer.toString(listeningID));
 	        t.start ();

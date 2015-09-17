@@ -11,8 +11,9 @@ public class Server {
 	public static Integer serverID;
 	public static Integer numServers;
 	public static ServerID[] otherServers;
-	public static OtherServers o;
-	public static Linker l;
+	
+	public static OtherServers getServers;
+	public static Linker linker;
 	
 	public static void main(String[] args) throws Exception {
 		if(args.length > 1 || args.length == 0){
@@ -22,29 +23,28 @@ public class Server {
 			serverID = Integer.parseInt(args[0]);
 		}
 		try{
-			o = new OtherServers("servers.txt");
-			otherServers = o.getServerIDs();
-			numServers = o.getNumServers();
-			l = new Linker(otherServers,serverID,numServers);
-			
-			for(int i=0; i<numServers; i++){
-				int s = serverID;
-				if(i!=s){
-					//l.receiveMsg(i);
-					ServerThread nt = new ServerThread(l.dataIn[i],i);
-					nt.start();
-					//nt.run();
-				}
-			}
-			l.multicast("Hello", "MultiCast");
-			Thread.sleep(5000);
-			l.close();
+			ConnectAllServers();
+			linker.SetupListeningThreads();
+			//linker.multicast("Hello", "MultiCast");
+			linker.Listen();
+			Thread.sleep(10000);
+			//linker.close();
 		} catch(IOException e){
 			System.out.println(e);
-		}
+		} catch(IllegalArgumentException e){
+			System.out.println("Must choose serverID that is less than number of servers");
+		} 
 
 	}
-
+	
+	static private void ConnectAllServers() throws Exception{
+			getServers = new OtherServers("servers.txt");
+			otherServers = getServers.getServerIDs();
+			numServers = getServers.getNumServers();
+			if(serverID >= numServers) throw new IllegalArgumentException();
+			linker = new Linker(otherServers,serverID,numServers);
+	}
+	
 }
 
 
