@@ -27,7 +27,7 @@ public class Server {
 			numServers = o.getNumServers();
 			l = new Linker(otherServers,serverID,numServers);
 			l.multicast("Hello", "MultiCast");
-			for(int i=0; i<serverID; i++){
+			for(int i=0; i<numServers; i++){
 				int s = serverID;
 				if(i!=s){
 					l.receiveMsg(i);
