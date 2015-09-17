@@ -3,7 +3,7 @@ import java.io.*;
 public class Linker {
     PrintWriter[] dataOut;
     BufferedReader[] dataIn;
-    BufferedReader dIn;
+    //BufferedReader dIn;
     ServerID[] otherServers;
     int myId, N;
     Connector connector;

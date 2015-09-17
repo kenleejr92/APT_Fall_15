@@ -26,13 +26,17 @@ public class Server {
 			otherServers = o.getServerIDs();
 			numServers = o.getNumServers();
 			l = new Linker(otherServers,serverID,numServers);
-			l.multicast("Hello", "MultiCast");
+			
 			for(int i=0; i<numServers; i++){
 				int s = serverID;
 				if(i!=s){
-					l.receiveMsg(i);
+					//l.receiveMsg(i);
+					ServerThread nt = new ServerThread(l.dataIn[i],i);
+					nt.start();
+					//nt.run();
 				}
 			}
+			l.multicast("Hello", "MultiCast");
 			Thread.sleep(5000);
 			l.close();
 		} catch(IOException e){
