@@ -38,6 +38,7 @@ public class ClientThread extends Thread {
 							Thread.yield();
 						}
 						Linker.x++;
+						//linker.Update();
 						linker.Release();
 						System.out.println(Linker.x);
 						break;

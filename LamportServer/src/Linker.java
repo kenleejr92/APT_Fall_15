@@ -12,8 +12,8 @@ public class Linker {
     public ThreadGroup serverListeners;
 	public ThreadGroup clientListeners;
 	
-	private Lock requestLock;
-	private Lock clockLock;
+	public Lock requestLock;
+	public Lock clockLock;
 	private Double[] qR;
 	private Double[] qW;
 	private Double[] depClock;
@@ -79,29 +79,35 @@ public class Linker {
     
     public void Request(){
     	requestLock.lock();
+    	clockLock.lock();
     	qR[myId] = depClock[myId];
     	System.out.println("Requesting at: " + depClock[myId]);
+    	clockLock.unlock();
     	requestLock.unlock();
+    	
     	BroadCast("Req ");
     }
     
     public void Release(){
     	requestLock.lock();
+    	clockLock.lock();
     	qR[myId] = Double.POSITIVE_INFINITY;
     	System.out.println("Releasing at: " + depClock[myId]);
+    	clockLock.unlock();
     	requestLock.unlock();
     	BroadCast("Rel ");
     }
     
     public void Update(){
+    	BroadCast("Up ");
     	//update x
     }
     
     public Double GetMyTimestamp(Integer myId){
     	Double temp;
-    	clockLock.lock();
+    	//clockLock.lock();
     	temp = depClock[myId];
-    	clockLock.unlock();
+    	//clockLock.unlock();
     	return temp;
     }
     
@@ -119,8 +125,12 @@ public class Linker {
     				clockLock.lock();
     				c.send(msg + depClock[myId]);
     				clockLock.unlock();
+    			}else if(msg.equals("Up ")){
+    				//clockLock.lock();
+    				c.send(msg + x);
+    				//clockLock.unlock();
     			}
-    			
+    			SendUpdateClock();
     		}
     	}
     }
