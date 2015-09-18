@@ -25,8 +25,7 @@ public class Server {
 		try{
 			ConnectAllServers();
 			linker.SetupListeningThreads();
-			//linker.multicast("Hello", "MultiCast");
-			linker.Listen();
+			linker.SetupClientThread();
 			Thread.sleep(10000);
 			//linker.close();
 		} catch(IOException e){
