@@ -15,7 +15,9 @@ public class Linker {
 	public TimeQueue qR;
 	public TimeQueue depClock;
 	public static Integer x;
+	public static Integer seatsLeft = 20;
 	public static Double Uptime;
+	public static String seating[] = null;
 	
     public Linker(ServerID[] s, Integer id, Integer numProc) throws Exception {
     	depClock = new TimeQueue("depClock", numProc, id);
@@ -25,6 +27,11 @@ public class Linker {
     	myId = id;
     	N = numProc;
   
+    	seating = new String[20];
+    	for(int i=0;i<seating.length;i++){
+    		seating[i] = "empty";
+    	}
+    	
         otherServers = s;
         activeChannels = new ArrayList<>(numProc);
         connector = new Connector();
@@ -67,9 +74,11 @@ public class Linker {
     	UpdateRequest(ID,Double.POSITIVE_INFINITY);
     }
     
-    public synchronized void Rec_Up(Integer ID, Double timestamp, Channel c, Integer newX){
+    public synchronized void Rec_Up(Integer ID, Double timestamp, Channel c, Integer newSeatsLeft){
     	RecvUpdateClock(ID, timestamp);
-    	x = newX;
+    	//x = newX;
+    	seatsLeft = newSeatsLeft;
+    	
     	Send_Ack(c, depClock.get(myId));
     }
     
@@ -119,7 +128,10 @@ public class Linker {
     				channel.send(msg + depClock.get(myId));
     				SendUpdateClock();
     			}else if(msg.equals("Up ")){
-    				channel.send(msg + Uptime + " " + x);
+    				//channel.send(msg + Uptime + " " + x);
+    				channel.send(msg + Uptime + " " + seatsLeft);
+    				//channel.send("UpSeating " + seating);
+    				
     			}
     			
     		}
@@ -191,4 +203,34 @@ public class Linker {
     public int getMyId() { return myId; }
     public int getNumProc() { return N; }
     public void close() {connector.closeSockets();}
+    
+    
+    public static void addSeatingForName(String Name, int seatsNeeded){
+    	for(int i=0; i<seating.length;i++){
+    		if(seating[i].equals("empty")){
+    			seating[i] = Name;
+    			System.out.print(i);
+    			--seatsNeeded;
+    			if(seatsNeeded==0) return;
+    			System.out.print(",");
+    		}
+    	}
+    }
+
+	public static void reserveSeats(String name, String seats) {
+		// TODO Auto-generated method stub
+		int seatsNeeded = Integer.parseInt(seats);
+		
+		if(seatsLeft<seatsNeeded){
+			System.out.println("Failed: only " + seatsLeft + " seats are left but "
+					+ seats + " seats are requested");
+			return;
+		}
+		
+		seatsLeft -= seatsNeeded;
+		System.out.println("The seats have been reserved for " + name + ": " + seats + " seats");
+		
+		
+		System.out.println("After request: " + seatsLeft + " are left");
+	}
 }

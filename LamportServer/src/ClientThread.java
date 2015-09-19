@@ -29,10 +29,19 @@ public class ClientThread extends Thread {
 //				System.out.println(">> ");
 //				BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 //				line = in.readLine();
-				String line = "Increment";
+				
+				//String line = "Increment";
+				String line = "reserve shreyas 1";
+				
+				
 				if(line!=null){
 					StringTokenizer st = new StringTokenizer(line);
 					String tag = st.nextToken();
+					String name = st.nextToken();
+					String seats = Integer.toString(0);
+					if(st.hasMoreTokens()){
+						seats = st.nextToken();
+					}
 					switch(tag){
 					case "Increment":
 						linker.Request();
@@ -46,6 +55,20 @@ public class ClientThread extends Thread {
 						}
 						linker.Uptime = Double.POSITIVE_INFINITY;
 						System.out.println("After increment: " + Linker.x);
+						linker.Release();
+						break;
+					case "reserve":
+						linker.Request();
+						while(!linker.CanAccess()){
+							Thread.yield();
+						}
+						Linker.reserveSeats(name, seats);
+						//Linker.seatsLeft--; //Critical section
+						linker.Send_Up();
+						while(!linker.DoneUpdating()){
+							Thread.yield();
+						}
+						linker.Uptime = Double.POSITIVE_INFINITY;
 						linker.Release();
 						break;
 					default:
