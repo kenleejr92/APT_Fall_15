@@ -24,6 +24,11 @@ public class ClientThread extends Thread {
 	
 	public void run() {
 		while(true){
+//			try{
+//				String line;
+//				System.out.println(">> ");
+//				BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+//				line = in.readLine();
 				String line = "Increment";
 				if(line!=null){
 					StringTokenizer st = new StringTokenizer(line);
@@ -34,14 +39,22 @@ public class ClientThread extends Thread {
 						while(!linker.CanAccess()){
 							Thread.yield();
 						}
-						Linker.x++;
+						Linker.x++; //Critical section
+						linker.Send_Up();
+						while(!linker.DoneUpdating()){
+							Thread.yield();
+						}
+						linker.Uptime = Double.POSITIVE_INFINITY;
+						System.out.println("After increment: " + Linker.x);
 						linker.Release();
-						System.out.println(Linker.x);
 						break;
 					default:
 						System.out.println("Message Error");
 					}
 				}
+//			}catch(IOException e){
+//				System.out.println(e);
+//			}
 		}
 	}
 	

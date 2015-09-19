@@ -27,48 +27,25 @@ public class ServerThread extends Thread  {
 					//System.out.println(line);
 					Integer newX = 0;
 					Double timestamp = 0.0;
-					Double mytimestamp;
 					StringTokenizer st = new StringTokenizer(line);
 					String tag = st.nextToken();
-					if(tag.equals("Up")){
-						newX = Integer.parseInt(st.nextToken());
-					}else{
-						timestamp = Double.parseDouble(st.nextToken());
-					}
+					timestamp = Double.parseDouble(st.nextToken());
 					switch(tag){
 					case "Ack":
-						linker.RecvUpdateClock(channel.getChannelID(), timestamp);
-						//linker.clockLock.lock();
-						//mytimestamp = linker.depClock[Linker.myId];
-						//linker.clockLock.unlock();
-						//System.out.println("Ack from Server " + channel.getChannelID() + " at: " + mytimestamp);
+						linker.Rec_Ack(channel.getChannelID(), timestamp);
 						break;
 					case "Req":
-						linker.RecvUpdateClock(channel.getChannelID(), timestamp);
-						linker.UpdateRequest(channel.getChannelID(),timestamp);
-						linker.clockLock.lock();
-						mytimestamp = linker.depClock[Linker.myId];
-						linker.clockLock.unlock();
-						channel.send("Ack "+ mytimestamp);
-						linker.SendUpdateClock();
+						linker.Rec_Req(channel.getChannelID(), timestamp, channel);
 						break;
 					case "Rel":
-						newX = Integer.parseInt(st.nextToken());
-						Linker.x = newX;
-						linker.RecvUpdateClock(channel.getChannelID(), timestamp);
-						linker.UpdateRequest(channel.getChannelID(),Double.POSITIVE_INFINITY);
-						linker.clockLock.lock();
-						mytimestamp = linker.depClock[Linker.myId];
-						linker.clockLock.unlock();
-						channel.send("Ack "+ mytimestamp);
-						linker.SendUpdateClock();
+						linker.Rec_Rel(channel.getChannelID(), timestamp);
 						break;
 					case "Up":
-						//linker.RecvUpdateClock(channel.getChannelID(),timestamp);
-						linker.x = newX;
+						newX = Integer.parseInt(st.nextToken());
+						linker.Rec_Up(channel.getChannelID(), timestamp, channel, newX);
 						break;
 					default:
-						System.out.println("Message Error");
+						System.out.println(line);
 					}
 				}
 			} catch (IOException e) {

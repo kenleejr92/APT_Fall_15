@@ -11,29 +11,20 @@ public class Linker {
     
     public ThreadGroup serverListeners;
 	public ThreadGroup clientListeners;
-	
-	public Lock requestLock;
-	public Lock clockLock;
-	private Double[] qR;
-	private Double[] qW;
-	public Double[] depClock;
-	public static  Integer x;
+
+	public TimeQueue qR;
+	public TimeQueue depClock;
+	public static Integer x;
+	public static Double Uptime;
 	
     public Linker(ServerID[] s, Integer id, Integer numProc) throws Exception {
-    	depClock = new Double[numProc];
-    	qR = new Double[numProc];
-    	qW = new Double[numProc];
+    	depClock = new TimeQueue("depClock", numProc, id);
+    	qR = new TimeQueue("reqQ", numProc, id);
+ 
     	x=0;
     	myId = id;
     	N = numProc;
-    	for(int i=0;i<N;i++){
-    		if(i==myId) depClock[i]=1.0;
-    		else depClock[i]=0.0;
-    		qR[i]=Double.POSITIVE_INFINITY;
-    		qW[i]=Double.POSITIVE_INFINITY;
-    	}
-    	requestLock = new ReentrantLock();
-        clockLock = new ReentrantLock();
+  
         otherServers = s;
         activeChannels = new ArrayList<>(numProc);
         connector = new Connector();
@@ -58,87 +49,97 @@ public class Linker {
     	ClientThread ct = new ClientThread(this,clientListeners);
     	ct.start();
     }
+    
+    public synchronized void Rec_Ack(Integer ID, Double timestamp){
+    	RecvUpdateClock(ID, timestamp);
+    }
+    
+    public synchronized void Rec_Req(Integer ID, Double timestamp, Channel c){
+    	RecvUpdateClock(ID, timestamp);
+    	UpdateRequest(ID,timestamp);
+    	Send_Ack(c, depClock.get(myId));
+    }
+    
+    
+    public synchronized void Rec_Rel(Integer ID, Double timestamp){
+    	//System.out.println("After release from " + ID + " " + x);
+    	RecvUpdateClock(ID,timestamp);
+    	UpdateRequest(ID,Double.POSITIVE_INFINITY);
+    }
+    
+    public synchronized void Rec_Up(Integer ID, Double timestamp, Channel c, Integer newX){
+    	RecvUpdateClock(ID, timestamp);
+    	x = newX;
+    	Send_Ack(c, depClock.get(myId));
+    }
+    
+    public void Send_Ack(Channel c, Double timestamp){
+    	c.send("Ack "+ timestamp);
+    	SendUpdateClock();
+    }
+    
+    public synchronized void Send_Up(){
+    	Uptime = depClock.get(myId);
+    	BroadCast("Up ");
+    }
+    
     public void RecvUpdateClock(Integer recID, Double recClock){
-    	clockLock.lock();
-    	depClock[myId] = max(depClock[myId],recClock)+1;
-    	depClock[recID] = max(depClock[recID],recClock);
-    	clockLock.unlock();
+    	Double prev_myId = depClock.get(myId);
+    	Double prev_recID = depClock.get(recID);
+    	depClock.set(myId, max(prev_myId,recClock)+1);
+    	depClock.set(recID, max(prev_recID,recClock));
     }
     
     public void SendUpdateClock(){
-    	clockLock.lock();
-    	depClock[myId]++;
-    	clockLock.unlock();
+    	depClock.increment(myId);
     }
     
     public void UpdateRequest(Integer recID, Double value){
-    	requestLock.lock();
-    	qR[recID] = value;
-    	requestLock.unlock();
+    	qR.set(recID, value);
     }
     
-    public void Request(){
-    	requestLock.lock();
-    	clockLock.lock();
-    	qR[myId] = depClock[myId];
-    	//System.out.println("Requesting at: " + depClock[myId]);
-    	clockLock.unlock();
-    	requestLock.unlock();
-    	
+    public synchronized void Request(){
+    	Double req_ts = depClock.get(myId);
+    	qR.set(myId, req_ts);
     	BroadCast("Req ");
     }
     
-    public void Release(){
-    	requestLock.lock();
-    	clockLock.lock();
-    	qR[myId] = Double.POSITIVE_INFINITY;
-    	//System.out.println("Releasing at: " + depClock[myId]);
-    	clockLock.unlock();
-    	requestLock.unlock();
+    public synchronized void Release(){
+    	qR.set(myId, Double.POSITIVE_INFINITY);
     	BroadCast("Rel ");
     }
     
-    public void Update(){
-    	BroadCast("Up ");
-    	//update x
-    }
-    
-    public Double GetMyTimestamp(Integer myId){
-    	return depClock[myId];
-    }
-    
-    
     public void BroadCast(String msg){
-    	Iterator<Channel> i= activeChannels.iterator();
-    	while(i.hasNext()){
-    		Channel c = i.next();
-    		if(c!=null){
+    	for(Channel channel : activeChannels){
+    		if(channel!=null){
     			if(msg.equals("Req ")){
-    				requestLock.lock();
-    				c.send(msg + qR[myId]);
-    				requestLock.unlock();
+    				channel.send(msg + qR.get(myId));
+    				SendUpdateClock();
     			}else if(msg.equals("Rel ")){
-    				clockLock.lock();
-    				c.send(msg + depClock[myId] + " " + x);
-    				clockLock.unlock();
+    				channel.send(msg + depClock.get(myId));
+    				SendUpdateClock();
     			}else if(msg.equals("Up ")){
-    				c.send(msg + x);
+    				channel.send(msg + Uptime + " " + x);
     			}
-    			SendUpdateClock();
+    			
     		}
     	}
     }
     
-    public boolean CanAccess(){
+    public synchronized boolean CanAccess(){
     	boolean canAccess = false;
-    	requestLock.lock();
-    	clockLock.lock();
-    	if((myId == Min(qR)) && (myId == Min(depClock))){
+    	if((myId == qR.minIndex()) && (qR.get(myId) <= depClock.get(depClock.minIndex()))){
     		canAccess = true;
     	} else canAccess = false;
-    	clockLock.unlock();
-    	requestLock.unlock();
 		return canAccess;
+    }
+    
+    public synchronized boolean DoneUpdating(){
+    	boolean doneUpdating = false;
+    	if(Uptime <=  depClock.get(depClock.minIndex())){
+    		doneUpdating = true;
+    	}else doneUpdating = false;
+		return doneUpdating;
     }
     
     public void Listen(){
