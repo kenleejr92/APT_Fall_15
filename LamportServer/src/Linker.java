@@ -16,7 +16,7 @@ public class Linker {
 	public Lock clockLock;
 	private Double[] qR;
 	private Double[] qW;
-	private Double[] depClock;
+	public Double[] depClock;
 	public static  Integer x;
 	
     public Linker(ServerID[] s, Integer id, Integer numProc) throws Exception {
@@ -119,7 +119,7 @@ public class Linker {
     				requestLock.unlock();
     			}else if(msg.equals("Rel ")){
     				clockLock.lock();
-    				c.send(msg + depClock[myId]);
+    				c.send(msg + depClock[myId] + " " + x);
     				clockLock.unlock();
     			}else if(msg.equals("Up ")){
     				c.send(msg + x);
@@ -133,11 +133,11 @@ public class Linker {
     	boolean canAccess = false;
     	requestLock.lock();
     	clockLock.lock();
-    	if(qR[myId]<=min(qR) && qR[myId]<=min(depClock)){
+    	if((myId == Min(qR)) && (myId == Min(depClock))){
     		canAccess = true;
     	} else canAccess = false;
-    	requestLock.unlock();
     	clockLock.unlock();
+    	requestLock.unlock();
 		return canAccess;
     }
     
@@ -175,12 +175,17 @@ public class Linker {
     	else if(a<b) return b;
     	else return a;
     }
-    public static Double min(Double[] a){
+    public static Integer Min(Double[] a){
     	Double min = a[0];
+    	Integer minID = 0;
     	for(int i=0; i<a.length;i++){
-    		if(a[i]<min) min = a[i];
+    		if(a[i]<min){
+    			min = a[i];
+    			minID = i;
+    		}
     	}
-    	return min;
+    	return minID;
+    	
     }
     public int getMyId() { return myId; }
     public int getNumProc() { return N; }

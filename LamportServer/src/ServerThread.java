@@ -27,6 +27,7 @@ public class ServerThread extends Thread  {
 					//System.out.println(line);
 					Integer newX = 0;
 					Double timestamp = 0.0;
+					Double mytimestamp;
 					StringTokenizer st = new StringTokenizer(line);
 					String tag = st.nextToken();
 					if(tag.equals("Up")){
@@ -37,18 +38,29 @@ public class ServerThread extends Thread  {
 					switch(tag){
 					case "Ack":
 						linker.RecvUpdateClock(channel.getChannelID(), timestamp);
-						//System.out.println("Ack from Server " + channel.getChannelID() + " at: " + linker.GetMyTimestamp(Linker.myId));
+						//linker.clockLock.lock();
+						//mytimestamp = linker.depClock[Linker.myId];
+						//linker.clockLock.unlock();
+						//System.out.println("Ack from Server " + channel.getChannelID() + " at: " + mytimestamp);
 						break;
 					case "Req":
 						linker.RecvUpdateClock(channel.getChannelID(), timestamp);
 						linker.UpdateRequest(channel.getChannelID(),timestamp);
-						channel.send("Ack "+ linker.GetMyTimestamp(Linker.myId));
+						linker.clockLock.lock();
+						mytimestamp = linker.depClock[Linker.myId];
+						linker.clockLock.unlock();
+						channel.send("Ack "+ mytimestamp);
 						linker.SendUpdateClock();
 						break;
 					case "Rel":
+						newX = Integer.parseInt(st.nextToken());
+						Linker.x = newX;
 						linker.RecvUpdateClock(channel.getChannelID(), timestamp);
 						linker.UpdateRequest(channel.getChannelID(),Double.POSITIVE_INFINITY);
-						channel.send("Ack "+ linker.GetMyTimestamp(Linker.myId));
+						linker.clockLock.lock();
+						mytimestamp = linker.depClock[Linker.myId];
+						linker.clockLock.unlock();
+						channel.send("Ack "+ mytimestamp);
 						linker.SendUpdateClock();
 						break;
 					case "Up":
