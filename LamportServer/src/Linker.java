@@ -81,7 +81,7 @@ public class Linker {
     	requestLock.lock();
     	clockLock.lock();
     	qR[myId] = depClock[myId];
-    	System.out.println("Requesting at: " + depClock[myId]);
+    	//System.out.println("Requesting at: " + depClock[myId]);
     	clockLock.unlock();
     	requestLock.unlock();
     	
@@ -92,7 +92,7 @@ public class Linker {
     	requestLock.lock();
     	clockLock.lock();
     	qR[myId] = Double.POSITIVE_INFINITY;
-    	System.out.println("Releasing at: " + depClock[myId]);
+    	//System.out.println("Releasing at: " + depClock[myId]);
     	clockLock.unlock();
     	requestLock.unlock();
     	BroadCast("Rel ");
@@ -104,11 +104,7 @@ public class Linker {
     }
     
     public Double GetMyTimestamp(Integer myId){
-    	Double temp;
-    	//clockLock.lock();
-    	temp = depClock[myId];
-    	//clockLock.unlock();
-    	return temp;
+    	return depClock[myId];
     }
     
     
@@ -126,9 +122,7 @@ public class Linker {
     				c.send(msg + depClock[myId]);
     				clockLock.unlock();
     			}else if(msg.equals("Up ")){
-    				//clockLock.lock();
     				c.send(msg + x);
-    				//clockLock.unlock();
     			}
     			SendUpdateClock();
     		}

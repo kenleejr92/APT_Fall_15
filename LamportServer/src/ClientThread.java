@@ -24,10 +24,11 @@ public class ClientThread extends Thread {
 	
 	public void run() {
 		while(true){
-			try {
-				System.out.print(">> ");
-				BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-				String line = in.readLine();
+//			try {
+				//System.out.print(">> ");
+				//BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+				//String line = in.readLine();
+				String line = "Increment";
 				if(line!=null){
 					StringTokenizer st = new StringTokenizer(line);
 					String tag = st.nextToken();
@@ -38,7 +39,7 @@ public class ClientThread extends Thread {
 							Thread.yield();
 						}
 						Linker.x++;
-						//linker.Update();
+						linker.Update();
 						linker.Release();
 						System.out.println(Linker.x);
 						break;
@@ -46,9 +47,6 @@ public class ClientThread extends Thread {
 						System.out.println("Message Error");
 					}
 				}
-			} catch (IOException e) {
-				System.out.println("IO Error");
-			} 
 		}
 	}
 	
