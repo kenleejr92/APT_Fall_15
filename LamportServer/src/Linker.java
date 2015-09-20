@@ -74,10 +74,13 @@ public class Linker {
     	UpdateRequest(ID,Double.POSITIVE_INFINITY);
     }
     
-    public synchronized void Rec_Up(Integer ID, Double timestamp, Channel c, Integer newSeatsLeft){
+    public synchronized void Rec_Up(Integer ID, Double timestamp, Channel c, Integer newSeatsLeft, String[] updatedSeating){
     	RecvUpdateClock(ID, timestamp);
     	//x = newX;
     	seatsLeft = newSeatsLeft;
+    	for(int i=0; i<seating.length;i++){
+    		seating[i] = updatedSeating[i];
+    	}
     	
     	Send_Ack(c, depClock.get(myId));
     }
@@ -129,7 +132,14 @@ public class Linker {
     				SendUpdateClock();
     			}else if(msg.equals("Up ")){
     				//channel.send(msg + Uptime + " " + x);
-    				channel.send(msg + Uptime + " " + seatsLeft);
+    				
+    				String updateMsg = msg + Uptime + " " + seatsLeft;
+    				for(int i=0;i<seating.length;i++){
+    					updateMsg += " " + seating[i];
+    				}
+    				
+    				channel.send(updateMsg);
+    				
     				//channel.send("UpSeating " + seating);
     				
     			}
@@ -211,7 +221,11 @@ public class Linker {
     			seating[i] = Name;
     			System.out.print(i);
     			--seatsNeeded;
-    			if(seatsNeeded==0) return;
+    			--seatsLeft;
+    			if(seatsNeeded==0){
+    				System.out.print("\n");
+    				return;
+    			}
     			System.out.print(",");
     		}
     	}
@@ -227,10 +241,11 @@ public class Linker {
 			return;
 		}
 		
-		seatsLeft -= seatsNeeded;
-		System.out.println("The seats have been reserved for " + name + ": " + seats + " seats");
+		//seatsLeft -= seatsNeeded;
+//		System.out.println("The seats have been reserved for " + name + ": " + seats + " seats");
+		System.out.print("The seats have been reserved for " + name + ": ");
+		addSeatingForName(name, seatsNeeded);
 		
-		
-		System.out.println("After request: " + seatsLeft + " are left");
+		//System.out.println("After request: " + seatsLeft + " are left");
 	}
 }

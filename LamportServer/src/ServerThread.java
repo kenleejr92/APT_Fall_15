@@ -42,8 +42,13 @@ public class ServerThread extends Thread  {
 						break;
 					case "Up":
 						newX = Integer.parseInt(st.nextToken());
+						//new String updatedSeating[] = null; 
+						String updatedSeating[] = new String[linker.seating.length];
+						for(int i=0; i<linker.seating.length;i++){
+							updatedSeating[i] = st.nextToken();
+						}
 						//st.
-						linker.Rec_Up(channel.getChannelID(), timestamp, channel, newX);
+						linker.Rec_Up(channel.getChannelID(), timestamp, channel, newX, updatedSeating);
 						break;
 					default:
 						System.out.println(line);

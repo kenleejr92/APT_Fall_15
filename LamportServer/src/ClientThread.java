@@ -31,7 +31,7 @@ public class ClientThread extends Thread {
 //				line = in.readLine();
 				
 				//String line = "Increment";
-				String line = "reserve shreyas 1";
+				String line = "reserve shreyas,rao 1";
 				
 				
 				if(line!=null){
