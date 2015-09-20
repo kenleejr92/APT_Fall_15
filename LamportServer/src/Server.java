@@ -9,6 +9,7 @@ public class Server {
 	 * @param args
 	 */
 	public static Integer serverID;
+	public static String option;
 	public static Integer numServers;
 	public static ServerID[] otherServers;
 	
@@ -16,17 +17,25 @@ public class Server {
 	public static Linker linker;
 	
 	public static void main(String[] args) throws Exception {
-		if(args.length > 1 || args.length == 0){
+		if(args.length != 2){
 			System.out.println("Incorrect Arguments");
 			System.exit(0);
 		}else{
-			serverID = Integer.parseInt(args[0]);
+			serverID = Integer.parseInt(args[1]);
+			option = args[0];
 		}
 		try{
-			ConnectAllServers();
-			linker.SetupListeningThreads();
-			linker.SetupClientThread();
-			Thread.sleep(10000);
+			if(option.equals("-i")){		//initialize 
+				ConnectAllServers(option);
+				linker.SetupListeningThreads();
+				linker.SetupClientThread();  //replace with linker.listen
+				linker.Listen();
+			}else if(option.equals("-r")){    //reconnect
+				ConnectAllServers(option);
+				linker.SetupListeningThreads();
+				linker.SetupClientThread();
+				linker.Listen();
+			}
 			//linker.close();
 		} catch(IOException e){
 			System.out.println(e);
@@ -36,12 +45,12 @@ public class Server {
 
 	}
 	
-	static private void ConnectAllServers() throws Exception{
+	static private void ConnectAllServers(String option) throws Exception{
 			getServers = new OtherServers("servers.txt");
 			otherServers = getServers.getServerIDs();
 			numServers = getServers.getNumServers();
 			if(serverID >= numServers) throw new IllegalArgumentException();
-			linker = new Linker(otherServers,serverID,numServers);
+			linker = new Linker(otherServers,serverID,numServers,option);
 	}
 	
 }

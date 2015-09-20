@@ -40,4 +40,13 @@ public class TimeQueue {
     	}
     	return minID;
 	}
+	public synchronized Double minElement(){
+		Double min = queue[0];
+    	for(int i=0; i<queue.length;i++){
+    		if(queue[i]<min){
+    			min = queue[i];
+    		}
+    	}
+    	return min;
+	}
 }

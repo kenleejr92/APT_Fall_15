@@ -24,17 +24,35 @@ public class ClientThread extends Thread {
 	
 	public void run() {
 		while(true){
-//			try{
+			try{
 //				String line;
-//				System.out.println(">> ");
+//				System.out.print(">> ");
 //				BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 //				line = in.readLine();
 				String line = "Increment";
+				Thread.sleep(500);
 				if(line!=null){
 					StringTokenizer st = new StringTokenizer(line);
 					String tag = st.nextToken();
 					switch(tag){
 					case "Increment":
+						linker.Request();
+						while(!linker.CanAccess()){
+							Thread.yield();
+						}
+						//////////////////////////////////////////////////////////
+						Linker.x++; //Critical section
+						
+						linker.Send_Up();
+						while(!linker.DoneUpdating()){
+							Thread.yield();
+						}
+						Linker.Uptime = Double.POSITIVE_INFINITY;
+						////////////////////////////////////////////////////////////
+						System.out.println("After increment: " + Linker.x);
+						linker.Release();
+						break;
+					case "delete":
 						linker.Request();
 						while(!linker.CanAccess()){
 							Thread.yield();
@@ -48,13 +66,18 @@ public class ClientThread extends Thread {
 						System.out.println("After increment: " + Linker.x);
 						linker.Release();
 						break;
+					case "search":
+						break;
 					default:
 						System.out.println("Message Error");
 					}
 				}
-//			}catch(IOException e){
-//				System.out.println(e);
-//			}
+			} catch(IOException e){
+				System.out.println("Exception in Client Thread");
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	

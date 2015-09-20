@@ -7,14 +7,11 @@ public class Channel {
 	private BufferedReader in;
 	private PrintWriter out;
 	private Integer ID;
-	private Integer myID;
 	
-	public Channel(Socket s, BufferedReader br, PrintWriter bw, Integer id, Integer myId){
+	public Channel(Socket s, BufferedReader br, PrintWriter bw){
 		socket = s;
 		in = br;
 		out = bw;
-		ID = id;
-		myID = myId;
 	}
 	
 	public void close() throws IOException{
@@ -23,9 +20,9 @@ public class Channel {
 		out.close();
 	}
 	
-	public synchronized void send(String msg){
-		out.println(msg);
-		out.flush();
+	public synchronized void send(String msg) throws IOException{
+			out.println(msg);
+			out.flush();
 	}
 	
 	public String readLine() throws IOException{ 
@@ -40,8 +37,12 @@ public class Channel {
 		return ID;
 	}
 	
-	public Integer getMyID(){
-		return myID;
+	public void setID(Integer id){
+		ID = id;
+	}
+	
+	public Socket getSocket(){
+		return socket;
 	}
 	
 }

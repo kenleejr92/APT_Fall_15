@@ -7,37 +7,38 @@ public class Linker {
     Connector connector;
     ServerSocket listener;
     ServerID[] otherServers;
-    public static List<Channel> activeChannels;
+    public static SafeChannelList activeChannels;
     
     public ThreadGroup serverListeners;
 	public ThreadGroup clientListeners;
-
+	public String option;
 	public TimeQueue qR;
+	public TimeQueue qW;
 	public TimeQueue depClock;
 	public static Integer x;
 	public static Double Uptime;
 	
-    public Linker(ServerID[] s, Integer id, Integer numProc) throws Exception {
+    public Linker(ServerID[] s, Integer id, Integer numProc, String op) throws Exception {
     	depClock = new TimeQueue("depClock", numProc, id);
     	qR = new TimeQueue("reqQ", numProc, id);
- 
+    	qW = new TimeQueue("reqQ", numProc, id);
     	x=0;
     	myId = id;
     	N = numProc;
-  
+    	option = op;
         otherServers = s;
-        activeChannels = new ArrayList<>(numProc);
+        activeChannels = new SafeChannelList(new ArrayList<Channel>(numProc));
         connector = new Connector();
         serverListeners = new ThreadGroup("Server Listeners");
 		clientListeners = new ThreadGroup("Client Listeners");
-        connector.Connect(s, myId, numProc, activeChannels);
+        connector.Connect(s, myId, numProc, activeChannels, option);
     }
 
     public void SetupListeningThreads(){
     	ServerThread st;
-    	Iterator<Channel> i = activeChannels.iterator();
-    	while(i.hasNext()){
-    		Channel c = i.next();
+    	Channel c;
+    	for(int i=0; i<N; i++){
+    		c = activeChannels.get(i);
     		if(c!=null){
 	    		st = new ServerThread(c,this,serverListeners);
 	    		st.start();
@@ -54,7 +55,7 @@ public class Linker {
     	RecvUpdateClock(ID, timestamp);
     }
     
-    public synchronized void Rec_Req(Integer ID, Double timestamp, Channel c){
+    public synchronized void Rec_Req(Integer ID, Double timestamp, Channel c) throws IOException{
     	RecvUpdateClock(ID, timestamp);
     	UpdateRequest(ID,timestamp);
     	Send_Ack(c, depClock.get(myId));
@@ -67,18 +68,18 @@ public class Linker {
     	UpdateRequest(ID,Double.POSITIVE_INFINITY);
     }
     
-    public synchronized void Rec_Up(Integer ID, Double timestamp, Channel c, Integer newX){
+    public synchronized void Rec_Up(Integer ID, Double timestamp, Channel c, Integer newX) throws IOException{
     	RecvUpdateClock(ID, timestamp);
     	x = newX;
     	Send_Ack(c, depClock.get(myId));
     }
     
-    public void Send_Ack(Channel c, Double timestamp){
+    public void Send_Ack(Channel c, Double timestamp) throws IOException{
     	c.send("Ack "+ timestamp);
     	SendUpdateClock();
     }
     
-    public synchronized void Send_Up(){
+    public synchronized void Send_Up() throws IOException{
     	Uptime = depClock.get(myId);
     	BroadCast("Up ");
     }
@@ -98,19 +99,20 @@ public class Linker {
     	qR.set(recID, value);
     }
     
-    public synchronized void Request(){
+    public synchronized void Request()throws IOException{
     	Double req_ts = depClock.get(myId);
     	qR.set(myId, req_ts);
     	BroadCast("Req ");
     }
     
-    public synchronized void Release(){
+    public synchronized void Release() throws IOException{
     	qR.set(myId, Double.POSITIVE_INFINITY);
     	BroadCast("Rel ");
     }
     
-    public void BroadCast(String msg){
-    	for(Channel channel : activeChannels){
+    public void BroadCast(String msg) throws IOException{
+    	for(int i = 0; i<N; i++){
+    		Channel channel = activeChannels.get(i);
     		if(channel!=null){
     			if(msg.equals("Req ")){
     				channel.send(msg + qR.get(myId));
@@ -128,7 +130,7 @@ public class Linker {
     
     public synchronized boolean CanAccess(){
     	boolean canAccess = false;
-    	if((myId == qR.minIndex()) && (qR.get(myId) <= depClock.get(depClock.minIndex()))){
+    	if((myId == qR.minIndex()) && (qR.get(myId) <= depClock.minElement())){
     		canAccess = true;
     	} else canAccess = false;
 		return canAccess;
@@ -136,7 +138,7 @@ public class Linker {
     
     public synchronized boolean DoneUpdating(){
     	boolean doneUpdating = false;
-    	if(Uptime <=  depClock.get(depClock.minIndex())){
+    	if(Uptime <=  depClock.minElement()){
     		doneUpdating = true;
     	}else doneUpdating = false;
 		return doneUpdating;
@@ -144,28 +146,36 @@ public class Linker {
     
     public void Listen(){
     	listener = Connector.listener;
+    	ServerThread st;
 		Socket newSocket;
-		Integer portNum;
-		InetAddress IP;
+		PrintWriter pw;
+		BufferedReader br;
+		Channel c;
+		String line=null;
 		boolean serverConnected;
 		while(true){
 			try{
-				serverConnected = false;
 				newSocket = listener.accept();
-				portNum = newSocket.getPort();
-				IP = newSocket.getInetAddress();
-				ServerID sid = new ServerID(IP, portNum);
-				for(int i=0; i<otherServers.length; i++){
-					if(otherServers[i].equals(sid)){
-						//spawn server thread;
-						serverConnected = true;
-						break;
-					}
+				newSocket.setSoTimeout(5000);
+				pw = new PrintWriter(newSocket.getOutputStream());
+				br = new BufferedReader(new InputStreamReader(newSocket.getInputStream()));
+				c = new Channel(newSocket,br,pw);
+				while(line==null){
+					line = c.readLine();
 				}
-				if(!serverConnected){
+				System.out.println(line);
+				StringTokenizer s = new StringTokenizer(line);
+				if(s.nextToken().equals("ID")){
+					Integer ID = Integer.parseInt(s.nextToken());
+					c.setID(ID);
+					activeChannels.add(ID,c);
+					System.out.println("New Thread!");
+					st = new ServerThread(c, this, serverListeners);
+					st.start();
+				}else{
+					c.setID(null);
 					//spawn client thread
 				}
-				
 			}catch(IOException e){
 				System.out.println(e);
 			}

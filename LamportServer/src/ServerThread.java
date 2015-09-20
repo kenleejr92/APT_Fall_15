@@ -23,46 +23,72 @@ public class ServerThread extends Thread  {
 		while(!timeout){
 			try {
 				String line = channel.readLine();
+				//System.out.println(line);
+				//System.out.println(line + " from Server " + channel.getChannelID());
 				if(line!=null){
-					//System.out.println(line);
 					Integer newX = 0;
 					Double timestamp = 0.0;
+					Integer channelId;
 					StringTokenizer st = new StringTokenizer(line);
 					String tag = st.nextToken();
-					timestamp = Double.parseDouble(st.nextToken());
 					switch(tag){
 					case "Ack":
+						timestamp = Double.parseDouble(st.nextToken());
 						linker.Rec_Ack(channel.getChannelID(), timestamp);
 						break;
 					case "Req":
+						timestamp = Double.parseDouble(st.nextToken());
 						linker.Rec_Req(channel.getChannelID(), timestamp, channel);
 						break;
 					case "Rel":
+						timestamp = Double.parseDouble(st.nextToken());
 						linker.Rec_Rel(channel.getChannelID(), timestamp);
 						break;
 					case "Up":
+						timestamp = Double.parseDouble(st.nextToken());
 						newX = Integer.parseInt(st.nextToken());
 						linker.Rec_Up(channel.getChannelID(), timestamp, channel, newX);
+						break;
+					case "ID":
+						channelId = Integer.parseInt(st.nextToken());
+						channel.setID(channelId);
 						break;
 					default:
 						System.out.println(line);
 					}
-				}
-			} catch (IOException e) {
-				try{
-					channel.close();
-					//activeList.remove(channel);
+				}else{
 					timeout = true;
-					System.out.println("Timeout from " + channel.getChannelID());
-				} catch(IOException d){
-					System.out.println(d);
+					Linker.activeChannels.remove(channel.getChannelID());
+					linker.qR.set(channel.getChannelID(), Double.POSITIVE_INFINITY);
+					linker.depClock.set(channel.getChannelID(), Double.POSITIVE_INFINITY);
 				}
-			} 
+			} catch (SocketTimeoutException e) {
+				timeout = true;
+				//channel.close();
+				Linker.activeChannels.remove(channel.getChannelID());
+				linker.qR.set(channel.getChannelID(), Double.POSITIVE_INFINITY);
+				linker.depClock.set(channel.getChannelID(), Double.POSITIVE_INFINITY);
+				System.out.println(e);
+				System.out.println("Timeout from " + channel.getChannelID());
+			} catch(IOException e){
+				timeout = true;
+				//channel.close();
+				Linker.activeChannels.remove(channel.getChannelID());
+				linker.qR.set(channel.getChannelID(), Double.POSITIVE_INFINITY);
+				linker.depClock.set(channel.getChannelID(), Double.POSITIVE_INFINITY);
+				System.out.println(e);
+				System.out.println("Timeout from " + channel.getChannelID());
+			}
 		}
 	}
 	
 	public void start() {
 		if(t==null){
+			try {
+				channel.send("ID "+ Linker.myId);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			t = new Thread (this);
 	        t.start ();
 		}
