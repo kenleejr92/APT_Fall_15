@@ -24,14 +24,14 @@ public class ClientThread extends Thread {
 	
 	public void run() {
 		while(true){
-//			try{
-//				String line;
-//				System.out.println(">> ");
-//				BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-//				line = in.readLine();
+			try{
+				String line;
+				System.out.println(">> ");
+				BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+				line = in.readLine();
 				
 				//String line = "Increment";
-				String line = "reserve shreyas,rao 1";
+				//String line = "reserve shreyas,rao 1";
 				
 				
 				if(line!=null){
@@ -63,7 +63,33 @@ public class ClientThread extends Thread {
 							Thread.yield();
 						}
 						Linker.reserveSeats(name, seats);
-						//Linker.seatsLeft--; //Critical section
+						linker.Send_Up();
+						while(!linker.DoneUpdating()){
+							Thread.yield();
+						}
+						linker.Uptime = Double.POSITIVE_INFINITY;
+						linker.Release();
+						break;
+					case "search":
+						linker.Request();
+						while(!linker.CanAccess()){
+							Thread.yield();
+						}
+						linker.search(name);
+						//Ken: do we still need to send update for search?
+						linker.Send_Up();
+						while(!linker.DoneUpdating()){
+							Thread.yield();
+						}
+						linker.Uptime = Double.POSITIVE_INFINITY;
+						linker.Release();
+						break;
+					case "delete":
+						linker.Request();
+						while(!linker.CanAccess()){
+							Thread.yield();
+						}
+						linker.delete(name);
 						linker.Send_Up();
 						while(!linker.DoneUpdating()){
 							Thread.yield();
@@ -75,9 +101,9 @@ public class ClientThread extends Thread {
 						System.out.println("Message Error");
 					}
 				}
-//			}catch(IOException e){
-//				System.out.println(e);
-//			}
+			}catch(IOException e){
+				System.out.println(e);
+			}
 		}
 	}
 	

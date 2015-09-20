@@ -215,37 +215,82 @@ public class Linker {
     public void close() {connector.closeSockets();}
     
     
-    public static void addSeatingForName(String Name, int seatsNeeded){
+    public static String addSeatingForName(String Name, int seatsNeeded){
+    	String res = "";
     	for(int i=0; i<seating.length;i++){
     		if(seating[i].equals("empty")){
     			seating[i] = Name;
-    			System.out.print(i);
+    			res += i;
     			--seatsNeeded;
     			--seatsLeft;
     			if(seatsNeeded==0){
-    				System.out.print("\n");
-    				return;
+    				return res;
     			}
-    			System.out.print(",");
+    			res += ",";
     		}
     	}
+    	return res;
     }
 
-	public static void reserveSeats(String name, String seats) {
-		// TODO Auto-generated method stub
+	public static String reserveSeats(String name, String seats) {
 		int seatsNeeded = Integer.parseInt(seats);
-		
+		String res = "";
+		String seatNums = findSeats(name);
 		if(seatsLeft<seatsNeeded){
-			System.out.println("Failed: only " + seatsLeft + " seats are left but "
-					+ seats + " seats are requested");
-			return;
+			res = "Failed: only " + seatsLeft + " seats are left but "
+					+ seats + " seats are requested";
+		}else if(seatNums.equals("")){
+			res = "The seats have been reserved for " + name + ": ";
+			res += addSeatingForName(name, seatsNeeded); //this prints seat numbers and subtracts from total
+		}
+		else{
+			res = "Failed: " + name + " has booked the following seats: " + seatNums;
 		}
 		
-		//seatsLeft -= seatsNeeded;
-//		System.out.println("The seats have been reserved for " + name + ": " + seats + " seats");
-		System.out.print("The seats have been reserved for " + name + ": ");
-		addSeatingForName(name, seatsNeeded);
-		
-		//System.out.println("After request: " + seatsLeft + " are left");
+		System.out.println(res);
+		return res;
 	}
+	
+	private static String findSeats(String name){
+		String res = "";
+		for(int i=0;i<seating.length;i++){
+			if(seating[i].equals(name)){
+				res += i + " ";
+			}
+		}
+		return res;
+	}
+	
+	public static String search(String name){
+		String res = findSeats(name);
+		
+		if(res.equals("")){
+			res = "Failed: no reservation is made by " + name;
+		}
+
+		System.out.println(res);
+		return res;
+	}
+	
+	public static String delete(String name){
+		int releasedSeats = 0;
+		String res = "";
+		for(int i=0;i<seating.length;i++){
+			if(seating[i].equals(name)){
+				++releasedSeats;
+				seating[i] = "empty";
+				++seatsLeft;
+			}
+		}
+		
+		if(releasedSeats==0){
+			res = "Failed: no reservation is made by " + name;
+		}else{
+			res = releasedSeats + " have been released. " + seatsLeft + " seats are now available";
+		}
+		System.out.println(res);
+		return res;
+	
+	}
+	
 }
