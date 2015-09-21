@@ -15,7 +15,7 @@ public class Connector {
 		        /* accept connections from all the smaller processes */
 		        for (int i = 0; i < myId; i++) {
 		            Socket s = listener.accept(); 
-		            s.setSoTimeout(5000);
+		            //s.setSoTimeout(5000);
 		            BufferedReader dIn = new BufferedReader(
 	                new InputStreamReader(s.getInputStream()));
 	                PrintWriter dOut = new PrintWriter(s.getOutputStream());
@@ -26,7 +26,7 @@ public class Connector {
 		        /* contact all the bigger processes */
 		        for (int i = myId + 1; i < numProc; i++) {
 		            Socket s = new Socket(IDtable[i].IP, IDtable[i].portNum);
-		            s.setSoTimeout(5000);
+		            //s.setSoTimeout(5000);
 		            BufferedReader dIn = new BufferedReader(new
 		            InputStreamReader(s.getInputStream()));
 		            PrintWriter dOut = new PrintWriter(s.getOutputStream());
@@ -41,7 +41,7 @@ public class Connector {
 	        		}else{
 		        		try{
 		        			Socket s = new Socket(IDtable[i].IP, IDtable[i].portNum);
-				            s.setSoTimeout(5000);
+				            //s.setSoTimeout(5000);
 				            System.out.println("New Socket Found!");
 				            BufferedReader dIn = new BufferedReader(new
 				            InputStreamReader(s.getInputStream()));

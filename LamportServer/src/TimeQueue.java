@@ -4,19 +4,32 @@ public class TimeQueue {
 	String type;
 	Integer N;
 	Integer myId;
-	public TimeQueue(String t, Integer size, Integer id){
+	public TimeQueue(String t, Integer size, Integer id, String option){
 		queue = new Double[size];
 		myId = id;
 		N=size;
 		type = t;
-		if(type.equals("depClock")){
-			for(int i=0;i<size;i++){
-				if(i==myId) queue[i]=1.0;
-				else queue[i]=0.0;
+		if(option.equals("-i")){
+			if(type.equals("depClock")){
+				for(int i=0;i<size;i++){
+					if(i==myId) queue[i]=1.0;
+					else queue[i]=0.0;
+				}
+			}else if(type.equals("reqQ")){
+				for(int i=0; i<size; i++){
+					queue[i]=Double.POSITIVE_INFINITY;
+				}
 			}
-		}else if(type.equals("reqQ")){
-			for(int i=0; i<size; i++){
-				queue[i]=Double.POSITIVE_INFINITY;
+		}else{
+			if(type.equals("depClock")){
+				for(int i=0;i<size;i++){
+					if(i==myId) queue[i]=1.0;
+					else queue[i]=Double.POSITIVE_INFINITY;
+				}
+			}else if(type.equals("reqQ")){
+				for(int i=0; i<size; i++){
+					queue[i]=Double.POSITIVE_INFINITY;
+				}
 			}
 		}
 	}

@@ -25,15 +25,20 @@ public class ClientThread extends Thread {
 	public void run() {
 		while(true){
 			try{
-//				String line;
-//				System.out.print(">> ");
-//				BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-//				line = in.readLine();
-				String line = "Increment";
-				Thread.sleep(500);
+				String line;
+				System.out.print(">> ");
+				BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+				line = in.readLine();
+				//String line = "Increment";
+				//Thread.sleep(500);
 				if(line!=null){
 					StringTokenizer st = new StringTokenizer(line);
 					String tag = st.nextToken();
+					String name = st.nextToken();
+					String seats = Integer.toString(0);
+					if(st.hasMoreTokens()){
+						seats = st.nextToken();
+					}
 					switch(tag){
 					case "Increment":
 						linker.Request();
@@ -52,21 +57,45 @@ public class ClientThread extends Thread {
 						System.out.println("After increment: " + Linker.x);
 						linker.Release();
 						break;
-					case "delete":
+					case "reserve":
 						linker.Request();
 						while(!linker.CanAccess()){
 							Thread.yield();
 						}
-						Linker.x++; //Critical section
+						Linker.reserveSeats(name, seats);
 						linker.Send_Up();
 						while(!linker.DoneUpdating()){
 							Thread.yield();
 						}
 						linker.Uptime = Double.POSITIVE_INFINITY;
-						System.out.println("After increment: " + Linker.x);
 						linker.Release();
 						break;
 					case "search":
+						linker.Request();
+						while(!linker.CanAccess()){
+							Thread.yield();
+						}
+						linker.search(name);
+						//Ken: do we still need to send update for search?
+						linker.Send_Up();
+						while(!linker.DoneUpdating()){
+							Thread.yield();
+						}
+						linker.Uptime = Double.POSITIVE_INFINITY;
+						linker.Release();
+						break;
+					case "delete":
+						linker.Request();
+						while(!linker.CanAccess()){
+							Thread.yield();
+						}
+						linker.delete(name);
+						linker.Send_Up();
+						while(!linker.DoneUpdating()){
+							Thread.yield();
+						}
+						linker.Uptime = Double.POSITIVE_INFINITY;
+						linker.Release();
 						break;
 					default:
 						System.out.println("Message Error");
@@ -74,10 +103,11 @@ public class ClientThread extends Thread {
 				}
 			} catch(IOException e){
 				System.out.println("Exception in Client Thread");
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			} 
+//			catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 		}
 	}
 	
