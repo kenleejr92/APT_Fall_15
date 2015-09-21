@@ -12,9 +12,9 @@ public class Linker {
     public ThreadGroup serverListeners;
 	public ThreadGroup clientListeners;
 	public String option;
-	public TimeQueue qR;
+	public static TimeQueue qR;
 	public TimeQueue qW;
-	public TimeQueue depClock;
+	public static TimeQueue depClock;
 	public static Integer x;
 	public static Double Uptime;
 	public static Integer seatsLeft = 20;
@@ -163,6 +163,7 @@ public class Linker {
     public void Listen(){
     	listener = Connector.listener;
     	ServerThread st;
+    	ClientThread ct;
 		Socket newSocket;
 		PrintWriter pw;
 		BufferedReader br;
@@ -173,27 +174,31 @@ public class Linker {
 			try{
 				newSocket = listener.accept();
 				//newSocket.setSoTimeout(5000);
+				//System.out.println("New Thread!");
 				pw = new PrintWriter(newSocket.getOutputStream());
 				br = new BufferedReader(new InputStreamReader(newSocket.getInputStream()));
 				c = new Channel(newSocket,br,pw);
 				while(line==null){
 					line = c.readLine();
 				}
-				System.out.println(line);
+				//System.out.println(line);
 				StringTokenizer s = new StringTokenizer(line);
-				if(s.nextToken().equals("ID")){
+				String tag = s.nextToken();
+				if(tag.equals("ID")){
 					Integer ID = Integer.parseInt(s.nextToken());
 					c.setID(ID);
 					activeChannels.add(ID,c);
-					System.out.println("New Thread!");
+					//System.out.println("New Thread!");
 					st = new ServerThread(c, this, serverListeners);
 					st.start();
-				}else{
+				}else if(tag.equals("Client")){
 					c.setID(null);
-					//spawn client thread
+					//System.out.println("Client arrived");
+					ct = new ClientThread(c,this,clientListeners);
+					ct.start();
 				}
 			}catch(IOException e){
-				System.out.println(e);
+				//System.out.println(e);
 			}
 		}
     }
@@ -247,7 +252,7 @@ public class Linker {
 			res = "Failed: " + name + " has booked the following seats: " + seatNums;
 		}
 		
-		System.out.println(res);
+		//System.out.println(res);
 		return res;
 	}
 	
@@ -268,7 +273,7 @@ public class Linker {
 			res = "Failed: no reservation is made by " + name;
 		}
 
-		System.out.println(res);
+		//System.out.println(res);
 		return res;
 	}
 	
@@ -288,7 +293,7 @@ public class Linker {
 		}else{
 			res = releasedSeats + " have been released. " + seatsLeft + " seats are now available";
 		}
-		System.out.println(res);
+		//System.out.println(res);
 		return res;
 	
 	}

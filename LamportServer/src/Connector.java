@@ -31,7 +31,7 @@ public class Connector {
 		            InputStreamReader(s.getInputStream()));
 		            PrintWriter dOut = new PrintWriter(s.getOutputStream());
 		            Channel c = new Channel(s,dIn,dOut);
-		            System.out.println("Port " + s.getPort() + " ID " + i);
+		            //System.out.println("Port " + s.getPort() + " ID " + i);
 		            activeList.add(i,c);
 		        }
 	        }else if(option.equals("-r")){
@@ -42,7 +42,7 @@ public class Connector {
 		        		try{
 		        			Socket s = new Socket(IDtable[i].IP, IDtable[i].portNum);
 				            //s.setSoTimeout(5000);
-				            System.out.println("New Socket Found!");
+				            //System.out.println("New Socket Found!");
 				            BufferedReader dIn = new BufferedReader(new
 				            InputStreamReader(s.getInputStream()));
 				            PrintWriter dOut = new PrintWriter(s.getOutputStream());

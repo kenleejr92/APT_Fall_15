@@ -23,12 +23,16 @@ public class ClientThread extends Thread {
 	}
 	
 	public void run() {
-		while(true){
+		while(!timeout){
 			try{
+				String output;
 				String line;
-				System.out.print(">> ");
-				BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-				line = in.readLine();
+				line = channel.readLine();
+				if(line==null) timeout = true;
+				if(line.equals("Client")){
+					continue;
+				}
+				//System.out.println(line);
 				//String line = "Increment";
 				//Thread.sleep(500);
 				if(line!=null){
@@ -62,7 +66,8 @@ public class ClientThread extends Thread {
 						while(!linker.CanAccess()){
 							Thread.yield();
 						}
-						Linker.reserveSeats(name, seats);
+						output = Linker.reserveSeats(name, seats);
+						channel.send(output);
 						linker.Send_Up();
 						while(!linker.DoneUpdating()){
 							Thread.yield();
@@ -75,7 +80,8 @@ public class ClientThread extends Thread {
 						while(!linker.CanAccess()){
 							Thread.yield();
 						}
-						linker.search(name);
+						output = linker.search(name);
+						channel.send(output);
 						//Ken: do we still need to send update for search?
 						linker.Send_Up();
 						while(!linker.DoneUpdating()){
@@ -89,7 +95,8 @@ public class ClientThread extends Thread {
 						while(!linker.CanAccess()){
 							Thread.yield();
 						}
-						linker.delete(name);
+						output = linker.delete(name);
+						channel.send(output);
 						linker.Send_Up();
 						while(!linker.DoneUpdating()){
 							Thread.yield();
@@ -98,8 +105,10 @@ public class ClientThread extends Thread {
 						linker.Release();
 						break;
 					default:
-						System.out.println("Message Error");
+						//System.out.println("Message Error");
 					}
+				}else{
+					timeout = true;
 				}
 			} catch(IOException e){
 				System.out.println("Exception in Client Thread");

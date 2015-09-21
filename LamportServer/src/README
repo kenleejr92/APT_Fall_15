@@ -1,0 +1,20 @@
+Kenneth Lee (kl22943)    kennethlee@utexas.edu
+Shreyas Rao (sr37768)     shreyasrao@utexas.edu
+
+Compilation:
+Execute "javac -g .*.java"
+
+Known Bugs:
+Fault-tolerance works but under controlled conditions. Occasionally, a server will be brought back up in an inconsistent state. 
+Null-pointer exceptions will occasionally be thrown when servers are brought down and back up again. 
+Occasionally, a client will connect to a server and the server will think the client is another server instead of a client. 
+
+Instructions:
+The file "servers.txt" has each server's IP and port address. The first line of the file is the number of servers. Each line after that has an IP address and port address.
+
+The "run" script will start 4 servers in the background and will take about 8 seconds for initialization. 
+To start a client, enter "java Client" in the command line. 
+To crash a server, kill its process ID. 
+To bring back a server, enter "java Server -r <Server ID>"
+
+

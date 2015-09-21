@@ -28,12 +28,12 @@ public class Server {
 			if(option.equals("-i")){		//initialize 
 				ConnectAllServers(option);
 				linker.SetupListeningThreads();
-				linker.SetupClientThread();  //replace with linker.listen
+				//linker.SetupClientThread();  //replace with linker.listen
 				linker.Listen();
 			}else if(option.equals("-r")){    //reconnect
 				ConnectAllServers(option);
 				linker.SetupListeningThreads();
-				linker.SetupClientThread();
+				//linker.SetupClientThread();
 				linker.Listen();
 			}
 			//linker.close();

@@ -52,15 +52,28 @@ public class ServerThread extends Thread  {
 						for(int i=0; i<linker.seating.length;i++){
 							updatedSeating[i] = st.nextToken();
 						}
-						//st.
 						linker.Rec_Up(channel.getChannelID(), timestamp, channel, newX, updatedSeating);
 						break;
 					case "ID":
 						channelId = Integer.parseInt(st.nextToken());
 						channel.setID(channelId);
 						break;
+					case "X":
+						timestamp = Double.parseDouble(st.nextToken());
+						newX = Integer.parseInt(st.nextToken());
+						//new String updatedSeating[] = null; 
+						String updatedSeating2[] = new String[linker.seating.length];
+						for(int i=0; i<linker.seating.length;i++){
+							updatedSeating2[i] = st.nextToken();
+						}
+						Linker.seatsLeft = newX;
+				    	for(int i=0; i<Linker.seating.length;i++){
+				    		Linker.seating[i] = updatedSeating2[i];
+				    	}
+				    	Linker.depClock.set(Linker.myId, timestamp);
+				    	Linker.depClock.set(channel.getChannelID(), timestamp);
 					default:
-						System.out.println(line);
+						//System.out.println(line);
 					}
 				}else{
 					timeout = true;
@@ -92,6 +105,13 @@ public class ServerThread extends Thread  {
 		if(t==null){
 			try {
 				channel.send("ID "+ Linker.myId);
+				///////////////////////////////////////////
+				String updateMsg = "X " + Linker.depClock.get(Linker.myId) + " " + Linker.seatsLeft;
+				for(int j=0;j<Linker.seating.length;j++){
+					updateMsg += " " + Linker.seating[j];
+				}
+				channel.send(updateMsg);//send updated 
+				///////////////////////////////////////////////
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
