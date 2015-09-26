@@ -1,12 +1,3 @@
-import webapp2
-import cgi
-
-from google.appengine.api import users
-from google.appengine.ext import blobstore
-from google.appengine.ext import ndb
-from google.appengine.ext.webapp import blobstore_handlers
-from google.appengine.ext.webapp.util import run_wsgi_app
-
 # A custom datastore model for associating users with uploaded files.
 
 class Stream(ndb.Model):
@@ -91,11 +82,3 @@ class ViewPhotoHandler(blobstore_handlers.BlobstoreDownloadHandler):
             self.error(404)
         else:
             self.send_blob(photo_key)
-
-
-app = webapp2.WSGIApplication([('/', MainPageHandler),
-                               ('/create_stream', CreateStreamHandler),
-                               ('/upload_photo', PhotoUploadHandler),
-                               ('/view_photo/([^/]+)?', ViewPhotoHandler),
-                               ('/view_stream/.*', ViewStreamHandler)
-                              ], debug=True)
