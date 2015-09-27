@@ -13,12 +13,35 @@ class Stream(ndb.Model):
     name = ndb.StringProperty()
     photos = ndb.BlobKeyProperty(repeated=True)
     views = ndb.IntegerProperty()
+    user = ndb.StringProperty()
 
 class MainPageHandler(webapp2.RequestHandler):
     def get(self):
+        # Checks for active Google account session
+        user = users.get_current_user()
+
+        if user:
+            self.response.headers['Content-Type'] = 'text/html; charset=utf-8'
+            self.response.write('Connexus user: ' + user.nickname())
+        else:
+            self.redirect(users.create_login_url(self.request.uri))
+
+
+        #self.response.out.write('</ul>')
+        #self.response.out.write('<form action="/" method="logged_out" >')
+        #self.response.out.write('''<br><input type="logout" name="logout" value="Logout"> </form></body></html>''')
+
+
+        self.response.out.write(''
+                                '<form align="right" name="form1" method="get" action="/logout">'
+                                    '<label class="logoutLblPos">'
+                                    '<input name="logged_out" type="submit" id="submit2" value="log out">'
+                                    '</label>'
+                                '</form>')
+
         self.response.out.write('<html><body>')
         #Get the list of streams
-        qry = Stream.query()
+        qry = Stream.query(Stream.user == user.nickname())
         #Print the names in a list
         self.response.out.write('<ul>')
         for stream in qry :
@@ -27,6 +50,19 @@ class MainPageHandler(webapp2.RequestHandler):
         self.response.out.write('<form action="/create_stream" method="post" >')
         self.response.out.write('''Create Stream: <input type="text" name="stream_name" value="Name"><br><input type="submit"
             name="submit" value="Submit"> </form></body></html>''')
+
+
+
+
+class LoginPageHandler(webapp2.RequestHandler):
+    def get(self):
+        self.response.write("You have logged out")
+        #self.redirect(users.create_logout_url('/'))
+        #user = users.get_current_user()
+        #greeting = ('Welcome, %s! (<a href="%s">sign out</a>)' %
+                        #(user.nickname(), users.create_logout_url('/')))
+        #users.create_logout_url('/')
+        #users.get_current_user().
 
 #/view_stream
 class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler):
@@ -55,7 +91,7 @@ class CreateStreamHandler(webapp2.RequestHandler):
         #
         # #Create a new stream with name, no photos, and no views initially
         # #Add stream to the datastore
-        new_stream = Stream(name=stream_name,photos=[],views=0)
+        new_stream = Stream(name=stream_name,photos=[],views=0, user=users.get_current_user().nickname())
         new_stream.key = ndb.Key(Stream, stream_name)
         new_stream.put()
 
@@ -94,6 +130,7 @@ class ViewPhotoHandler(blobstore_handlers.BlobstoreDownloadHandler):
 
 
 app = webapp2.WSGIApplication([('/', MainPageHandler),
+                               ('/logout', LoginPageHandler),
                                ('/create_stream', CreateStreamHandler),
                                ('/upload_photo', PhotoUploadHandler),
                                ('/view_photo/([^/]+)?', ViewPhotoHandler),
