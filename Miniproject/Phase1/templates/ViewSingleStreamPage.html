@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+    <body>
+        <h1>Welcome to {{ stream_name }}</h1>
+         <div>
+        {% for key in photo_urls %}
+        <img src="{{ key }}=s32">
+        {% endfor %}
+        </div>
+        <h2>Upload a Photo</h2>
+        <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
+            Upload File:
+            <input type="file" name="file"><br>
+            <input type="submit" name="submit" value="Submit to {{ stream_name }}">
+        </form>
+    </body>
+    </body>
+</html>
+{% endautoescape %}

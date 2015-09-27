@@ -1,24 +1,13 @@
+<!DOCTYPE html>
+{% autoescape true %}
 <html>
     <body>
-    <h1>Connex.us</h1>
-    <div id="menu" align="left" >
-        <a>MANAGE</a> |
-        <a href="/~/" target="_self">CREATE</a> |
-        <a href="/~/" target="_self">VIEW</a> |
-        <a href="/~/" target="_self">TRENDING</a> |
-        <a href="/~/" target="_self">SOCIAL</a> |
-    </div>
-    <div style="width:100%;"> <!-- Main Div -->
-        Header
-        <div style="float:left; width:20%;">
-        Left  <!-- Set Div As your requirement -->
-        </div>
-        <div style="float:left; width:80%; margin-left:10px;">
-        Right  <!-- Set Div As your requirement -->
-        </div>
-        <div>
-        Footer
-        </div>
-    </div>
+    <h1>Upload a Photo</h1>
+    <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
+        Upload File:
+        <input type="file" name="file"><br>
+        <input type="submit" name="submit" value="Submit to {{ stream_name }}">
+    </form>
     </body>
 </html>
+{% endautoescape %}
