@@ -29,11 +29,13 @@ class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler):
         else :
             owner = False
             stream.views = stream.views + 1
+            stream.put()
 
         photo_keys = stream.photos
         photo_urls = []
         for key in photo_keys:
             photo_urls.append(images.get_serving_url(key))
+
 
         upload_url = blobstore.create_upload_url('/upload_photo')
 
