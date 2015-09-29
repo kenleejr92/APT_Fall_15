@@ -2,6 +2,7 @@ __author__ = 'kenlee'
 
 import cgi
 import jinja2
+import datetime
 from google.appengine.ext import blobstore
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import blobstore_handlers
@@ -29,6 +30,7 @@ class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler):
         else :
             owner = False
             stream.views = stream.views + 1
+            stream.view_queue.append(datetime.datetime.now())
             stream.put()
 
         photo_keys = stream.photos

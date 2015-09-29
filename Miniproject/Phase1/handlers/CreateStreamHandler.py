@@ -35,7 +35,7 @@ class CreateStreamHandler(webapp2.RequestHandler):
             #Create a new stream with name, no photos, and no views initially
             #Add stream to the datastore
             user = users.get_current_user()
-            new_stream = Stream(owner_id = user.user_id(),name=stream_name,photos=[],views=0, subscribed_users=[])
+            new_stream = Stream(owner_id = user.user_id(),name=stream_name,photos=[],views=0, subscribed_users=[], view_queue=[])
             new_stream.key = ndb.Key(Stream, stream_name)
             new_stream.put()
             self.redirect('/management')

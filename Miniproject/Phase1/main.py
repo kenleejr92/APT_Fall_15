@@ -14,6 +14,7 @@ from handlers.SearchStreamHandler import SearchStreamHandler
 from handlers.SubscribeHandler import SubscribeHandler
 from handlers.ErrorHandler import ErrorHandler
 from handlers.ViewAllHandler import ViewAllHandler
+from handlers.UpdateTrendingHandler import UpdateTrendingHandler
 
 
 
@@ -26,5 +27,6 @@ app = webapp2.WSGIApplication([('/', MainPageHandler),
                                ('/search_streams',SearchStreamHandler),
                                ('/subscribe',SubscribeHandler),
                                ('/view_all',ViewAllHandler),
-                               ('/error',ErrorHandler)
+                               ('/error',ErrorHandler),
+                               ('/update',UpdateTrendingHandler)
                               ], debug=True)
