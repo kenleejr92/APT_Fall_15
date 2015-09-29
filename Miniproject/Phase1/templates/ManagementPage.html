@@ -1,36 +1,35 @@
+<!DOCTYPE html>
+{% autoescape true %}
 <html>
-    <body>
+  <body>
     <h1>Connex.us</h1>
-    <div id="menu" align="left" >
-        <a>MANAGE</a> |
-        <a href="/~/" target="_self">CREATE</a> | 
-        <a href="/~/" target="_self">VIEW</a> | 
-        <a href="/~/" target="_self">TRENDING</a> |
-        <a href="/~/" target="_self">SOCIAL</a> |
+    <div>
+        Welcome {{ user.nickname() }}
+        <a href="{{ logout_url }}">sign out</a>
     </div>
+    <br>
+    <div>
+        Manage | <a href="/create_stream1">Create</a> |
+        <a href="/view_all">View</a> |
+        <a href="/search_streams">Search</a> |
+        <a href="/trending">Trending</a> |
+        <a href="/social">Social</a>
+    </div>
+    <br>
     <h2>Streams I own</h2>
-    <table style="width:100%",border="0">
-        <tr>
-            <td>Name</td>
-            <td>Last New Picture</td>
-            <td>Number of Pictures</td>
-            <td>Delete</td>
-       </tr>
-    </table>
-    <form>
-        <input type="submit" name="submit" value="Delete Checked" />
-    </form>
+    <ul>
+    {% for stream in my_streams %}
+        <li><a href="/view_stream/?stream_name={{ stream.name }}" >{{ stream.name }}</a></li>
+    {% endfor %}
+    </ul>
+    <br>
     <h2>Streams I subscribe to</h2>
-    <table style="width:100%",border="0">
-        <tr>
-            <td>Name</td>
-            <td>Last New Picture</td>
-            <td>Number of Pictures</td>
-            <td>Delete</td>
-       </tr>
-    </table>
-    <form>
-        <input type="submit" name="submit" value="Unsubscribe Checked Streams" />
-    </form>
-    </body>
+    <ul>
+    {% for stream in subscribed_streams %}
+        <li><a href="/view_stream/?stream_name={{ stream.name }}" >{{ stream.name }}</a></li>
+    {% endfor %}
+    </ul>
+    <br>
+  </body>
 </html>
+{% endautoescape %}

@@ -9,11 +9,17 @@
         {% endfor %}
         </div>
         <h2>Upload a Photo</h2>
+        {% if owner %}
         <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
             Upload File:
             <input type="file" name="file"><br>
             <input type="submit" name="submit" value="Submit to {{ stream_name }}">
         </form>
+        {% else %}
+        <form action="/subscribe" method="POST">
+            <input type="submit" name="submit" value="Subscribe to {{ stream_name }}">
+        </form>
+        {% endif %}
     </body>
     </body>
 </html>

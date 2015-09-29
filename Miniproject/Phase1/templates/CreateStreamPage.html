@@ -2,11 +2,21 @@
 {% autoescape true %}
 <html>
     <body>
-    <h1>Upload a Photo</h1>
-    <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
-        Upload File:
-        <input type="file" name="file"><br>
-        <input type="submit" name="submit" value="Submit to {{ stream_name }}">
+    <h1>Connex.us</h1>
+    <br>
+    <div>
+        <a href="/management">Manage</a> | Create |
+        <a href="/view_all">View</a> |
+        <a href="/search_streams">Search</a> |
+        <a href="/trending">Trending</a> |
+        <a href="/social">Social</a>
+    </div>
+    <br>
+    <form action="/create_stream2" method="post" >
+        Stream Name:
+        <input type="text" name="stream_name" value="Name">
+        <br>
+        <input type="submit" name="submit" value="Create Stream">
     </form>
     </body>
 </html>

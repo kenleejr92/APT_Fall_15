@@ -4,17 +4,9 @@
   <body>
     <h1>Welcome To Connexus!</h1>
     <h2>Share The World!</h2>
-    <ul>
-    {% for stream in streams %}
-        <li><a href="/view_stream/?stream_name={{ stream.name }}" >{{ stream.name }}</a></li>
-    {% endfor %}
-    </ul>
-    <form action="/create_stream" method="post" >
-        Create Stream:
-        <input type="text" name="stream_name" value="Name">
-        <br>
-        <input type="submit" name="submit" value="Submit">
-    </form>
+    <div>
+        <a href="{{ login_url }}">Sign in or register</a>
+    </div>
   </body>
 </html>
 {% endautoescape %}

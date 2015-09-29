@@ -4,6 +4,7 @@ import jinja2
 import cgi
 from google.appengine.ext import blobstore
 from google.appengine.ext import ndb
+from google.appengine.api import users
 from handlers.Stream import Stream
 
 #/create_stream
@@ -19,17 +20,9 @@ class CreateStreamHandler(webapp2.RequestHandler):
 
         # #Create a new stream with name, no photos, and no views initially
         # #Add stream to the datastore
-        new_stream = Stream(name=stream_name,photos=[],views=0)
+        user = users.get_current_user()
+        new_stream = Stream(owner_id = user.user_id(),name=stream_name,photos=[],views=0, subscribed_users=[])
         new_stream.key = ndb.Key(Stream, stream_name)
         new_stream.put()
 
-        #after upload return to /upload_photo
-        upload_url = blobstore.create_upload_url('/upload_photo')
-
-        template_values = {
-            'upload_url':upload_url,
-            'stream_name':stream_name
-        }
-
-        template = JINJA_ENVIRONMENT.get_template('CreateStreamPage.html')
-        self.response.write(template.render(template_values))
+        self.redirect('/management')
