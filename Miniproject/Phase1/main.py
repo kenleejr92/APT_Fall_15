@@ -15,7 +15,8 @@ from handlers.SubscribeHandler import SubscribeHandler
 from handlers.ErrorHandler import ErrorHandler
 from handlers.ViewAllHandler import ViewAllHandler
 from handlers.UpdateTrendingHandler import UpdateTrendingHandler
-
+from handlers.TrendingHandler import TrendingHandler
+from handlers.EmailHandler import EmailHandler
 
 
 app = webapp2.WSGIApplication([('/', MainPageHandler),
@@ -28,5 +29,7 @@ app = webapp2.WSGIApplication([('/', MainPageHandler),
                                ('/subscribe',SubscribeHandler),
                                ('/view_all',ViewAllHandler),
                                ('/error',ErrorHandler),
-                               ('/update',UpdateTrendingHandler)
+                               ('/update',UpdateTrendingHandler),
+                               ('/trending',TrendingHandler),
+                               ('/email',EmailHandler)
                               ], debug=True)

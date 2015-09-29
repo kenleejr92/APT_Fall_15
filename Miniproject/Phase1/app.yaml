@@ -7,6 +7,12 @@ handlers:
 - url: /
   script: main.app
 
+- url: /update
+  script: main.app
+
+- url: /email
+  script: main.app
+
 - url: /.*
   script: main.app
   login: required

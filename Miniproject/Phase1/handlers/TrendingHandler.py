@@ -6,21 +6,19 @@ import os
 from Stream import Stream
 from google.appengine.api import users
 
-class ViewAllHandler(webapp2.RequestHandler):
+class TrendingHandler(webapp2.RequestHandler):
     def get(self):
         JINJA_ENVIRONMENT = jinja2.Environment(
         loader=jinja2.FileSystemLoader('templates'),
         extensions=['jinja2.ext.autoescape'],
         autoescape=True)
 
-        user = users.get_current_user()
-        user_id = user.user_id()
-
         #Get the list of streams
-        my_streams = Stream.query(Stream.owner_id == user_id).order(Stream.timestamp)
+        streams = Stream.query().order(-Stream.views)
+
         template_values = {
-            'my_streams':my_streams,
+            'streams':streams
         }
 
-        template = JINJA_ENVIRONMENT.get_template('ViewAllStreamsPage.html')
+        template = JINJA_ENVIRONMENT.get_template('TrendingStreamsPage.html')
         self.response.write(template.render(template_values))

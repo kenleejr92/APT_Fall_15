@@ -12,6 +12,8 @@ class UpdateTrendingHandler(webapp2.RequestHandler):
         all_streams = Stream.query()
         for stream in all_streams:
             for date in stream.view_queue:
-                pass
-                # if current_time - date >
-        pass
+                minback = current_time - datetime.timedelta(hours=1)
+                if date < minback:
+                    stream.view_queue.remove(date)
+                    stream.views = stream.views - 1
+            stream.put()

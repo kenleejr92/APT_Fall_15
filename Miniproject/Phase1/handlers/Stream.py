@@ -9,3 +9,4 @@ class Stream(ndb.Model):
     views = ndb.IntegerProperty()
     subscribed_users = ndb.StringProperty(repeated=True)
     view_queue = ndb.DateTimeProperty(repeated=True)
+    timestamp = ndb.DateTimeProperty()
