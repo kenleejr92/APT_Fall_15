@@ -13,7 +13,7 @@ class EmailHandler(webapp2.RequestHandler):
         user = users.get_current_user()
         message.sender = user.email()
         message.subject = "Trending"
-        message.to="<s23rao@gmail.com>"
+        message.to=user.email()
         #Get the list of streams
         streams = Stream.query().order(-Stream.views)
         i = 0
@@ -24,7 +24,7 @@ class EmailHandler(webapp2.RequestHandler):
             top.append(stream.name)
             i = i + 1
         if len(top) == 3 :
-            message.body="'Trending: %s %s %s'" % (top[0], top[1], top[2])
+            message.body="'Top 3 Trending Streams: %s %s %s'" % (top[0], top[1], top[2])
         else:
-            message.body="'No Trending'"
+            message.body="'There are not 3 streams in the datastore'"
         message.send()

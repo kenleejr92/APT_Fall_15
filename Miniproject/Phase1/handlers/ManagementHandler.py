@@ -2,7 +2,6 @@ __author__ = 'kenlee'
 
 import webapp2
 import jinja2
-import os
 from Stream import Stream
 from google.appengine.api import users
 

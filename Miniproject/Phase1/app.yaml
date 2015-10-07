@@ -13,6 +13,12 @@ handlers:
 - url: /email
   script: main.app
 
+- url: /css
+  static_dir: assets/css
+
+- url: /js
+  static_dir: assets/js
+
 - url: /.*
   script: main.app
   login: required

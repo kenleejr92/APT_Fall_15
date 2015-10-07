@@ -1,7 +1,10 @@
-<!DOCTYPE html>
-{% autoescape true %}
-<html>
-  <body>
+{% extends "Base.html" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block body %}
     <h1>Connex.us</h1>
     <div>
         Welcome {{ user.nickname() }}
@@ -15,21 +18,61 @@
         <a href="/trending">Trending</a> |
         <a href="/social">Social</a>
     </div>
-    <br>
+
     <h2>Streams I own</h2>
-    <ul>
-    {% for stream in my_streams %}
-        <li><a href="/view_stream/?stream_name={{ stream.name }}" >{{ stream.name }}</a></li>
-    {% endfor %}
-    </ul>
+    <form action="/delete_streams" method="post">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Last New Picture</th>
+                <th>Number of Pictures</th>
+                <th>Delete</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for stream in my_streams %}
+            <tr>
+                <td><a href="/view_stream/?stream_name={{ stream.name }}" >{{ stream.name }}</a></td>
+                <td>{{ stream.date_last_added }}</td>
+                <td>{{ stream.num_photos }}</td>
+                <td>
+                    <input type="checkbox" name="deleted_streams" value="{{ stream.name }}">
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" name="delete_checked" value="Delete Checked Streams">
+    </form>
+
     <br>
     <h2>Streams I subscribe to</h2>
-    <ul>
-    {% for stream in subscribed_streams %}
-        <li><a href="/view_stream/?stream_name={{ stream.name }}" >{{ stream.name }}</a></li>
-    {% endfor %}
-    </ul>
-    <br>
-  </body>
-</html>
-{% endautoescape %}
+    <form action="/unsubscribe_streams" method="post">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Last New Picture</th>
+                <th>Number of Pictures</th>
+                <th>Views</th>
+                <th>Unsubscribe</th>
+            </tr>
+            <thead>
+            <tbody>
+            {% for stream in subscribed_streams %}
+            <tr>
+                <td><a href="/view_stream/?stream_name={{ stream.name }}" >{{ stream.name }}</a></td>
+                <td>{{ stream.date_last_added }}</td>
+                <td>{{ stream.num_photos }}</td>
+                <td>{{ stream.views }}</td>
+                <td>
+                    <input type="checkbox" name="unsubscribed_streams" value="{{ stream.name }}">
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" name="unsubscribe" value="Unsubscribe from Checked Streams">
+    </form>
+{% endblock %}

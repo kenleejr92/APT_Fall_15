@@ -17,6 +17,8 @@ from handlers.ViewAllHandler import ViewAllHandler
 from handlers.UpdateTrendingHandler import UpdateTrendingHandler
 from handlers.TrendingHandler import TrendingHandler
 from handlers.EmailHandler import EmailHandler
+from handlers.DeleteStreamsHandler import DeleteStreamsHandler
+from handlers.UnsubscribeHandler import UnsubscribeHandler
 
 
 app = webapp2.WSGIApplication([('/', MainPageHandler),
@@ -31,5 +33,7 @@ app = webapp2.WSGIApplication([('/', MainPageHandler),
                                ('/error',ErrorHandler),
                                ('/update',UpdateTrendingHandler),
                                ('/trending',TrendingHandler),
-                               ('/email',EmailHandler)
+                               ('/email',EmailHandler),
+                               ('/delete_streams',DeleteStreamsHandler),
+                               ('/unsubscribe_streams',UnsubscribeHandler),
                               ], debug=True)
