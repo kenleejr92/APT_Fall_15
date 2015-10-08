@@ -1,7 +1,10 @@
-<!DOCTYPE html>
-{% autoescape true %}
-<html>
-    <body>
+{% extends "Base.html" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block body %}
     <h1>Connex.us</h1>
     <br>
     <div>
@@ -12,12 +15,35 @@
         <a href="/social">Social</a>
     </div>
     <br>
-    <form action="/create_stream" method="post" >
-        Stream Name:
-        <input type="text" name="stream_name" value="Name">
-        <br>
-        <input type="submit" name="submit" value="Create Stream">
-    </form>
-    </body>
-</html>
-{% endautoescape %}
+    <div class="container-fluid">
+        <form role="form" action="/create_stream" method="post" >
+        <div class="row">
+            <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="stream_name">Stream Name:</label>
+                        <input type="text" name="stream_name" placeholder="Name" id="stream_name">
+                    </div>
+                    <div class="form-group">
+                        <label for="subscribers">Add Subscribers</label>
+                        <textarea class="form-control" name="subscribers" id="subscribers" placeholder="john@gmail.com"></textarea>
+                        <textarea class="form-control" name="message" placeholder="Optional Message for invite"></textarea>
+                    </div>
+            </div>
+
+            <div class="col-md-6">
+                   <div class="form-group">
+                      <label for="tags">Tag your stream</label>
+                      <textarea type="text" class="form-control" id="tags" name="tags" placeholder="#connexus"></textarea>
+                   </div>
+                   <div class="form-group">
+                       <label for="cover_image">URL to Cover Image (can be empty)</label>
+                       <input type="url" name="cover_image" id="cover_image">
+                   </div>
+            </div>
+        </div>
+            <div class="form-group">
+                <input type="submit" name="submit" value="Create Stream">
+            </div>
+        </form>
+    </div>
+{% endblock %}

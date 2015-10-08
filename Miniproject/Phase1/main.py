@@ -24,7 +24,7 @@ from handlers.UnsubscribeHandler import UnsubscribeHandler
 app = webapp2.WSGIApplication([('/', MainPageHandler),
                                ('/management',ManagementHandler),
                                ('/create_stream',CreateStreamHandler),
-                               ('/upload_photo', PhotoUploadHandler),
+                               ('/upload_photo/.*', PhotoUploadHandler),
                                ('/view_photo/([^/]+)?', ViewPhotoHandler),
                                ('/view_stream/.*', ViewStreamHandler),
                                ('/search_streams',SearchStreamHandler),

@@ -39,7 +39,7 @@ class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler):
             photo_urls.append(images.get_serving_url(key))
 
 
-        upload_url = blobstore.create_upload_url('/upload_photo')
+        upload_url = blobstore.create_upload_url('/upload_photo/?stream_name=%s' % stream_name)
 
         template_values = {
             'owner':owner,

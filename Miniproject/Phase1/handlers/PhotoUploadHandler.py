@@ -13,8 +13,7 @@ class PhotoUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
     def post(self):
         try:
             upload = self.get_uploads()[0]
-            str = cgi.escape(self.request.get('submit'))
-            stream_name = str.split()[2]
+            stream_name = cgi.escape(self.request.get('stream_name'))
             blob_key = upload.key()
             stream_key = ndb.Key(Stream,stream_name)
             stream = stream_key.get()
@@ -23,7 +22,6 @@ class PhotoUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             stream.date_last_added = datetime.date.today()
             stream.put()
 
-            self.redirect('/view_photo/%s' % upload.key())
-
+            self.redirect('/view_stream/?stream_name=%s' % stream_name)
         except:
             self.error(500)
