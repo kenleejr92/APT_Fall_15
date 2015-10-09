@@ -11,4 +11,7 @@ class DeleteStreamsHandler(webapp2.RequestHandler):
         for stream_name in stream_names:
             stream_key = ndb.Key(Stream,stream_name)
             stream_key.delete()
+
+
+
         self.redirect('/management')

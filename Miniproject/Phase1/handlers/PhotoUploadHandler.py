@@ -18,9 +18,16 @@ class PhotoUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             stream_key = ndb.Key(Stream,stream_name)
             stream = stream_key.get()
             stream.photos.append(blob_key)
+            updatedNum = stream.num_photos + 1
             stream.num_photos += 1
             stream.date_last_added = datetime.date.today()
             stream.put()
+
+            #encure redict happens after data store is updated (doesnt work atm)
+            # jobDone = False
+            # while(not jobDone):
+            #     check_stream = stream_key.get()
+            #     if check_stream.num_photos == updatedNum : jobDone = True
 
             self.redirect('/view_stream/?stream_name=%s' % stream_name)
         except:

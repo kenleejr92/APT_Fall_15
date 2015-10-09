@@ -58,4 +58,12 @@ class CreateStreamHandler(webapp2.RequestHandler):
                                 subscribed_users=subscribers,timestamp = datetime.datetime.now(), tags = tags, cover_image=cover_image)
             new_stream.key = ndb.Key(Stream, stream_name)
             new_stream.put()
+
+            #encure redict happens after data store is updated
+            jobDone = False
+            while(not jobDone):
+                search_results = Stream.query(Stream.name == stream_name)
+                for search in search_results:
+                    jobDone = True
+
             self.redirect('/management')
