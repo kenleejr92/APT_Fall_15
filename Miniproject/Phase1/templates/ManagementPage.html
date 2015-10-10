@@ -5,19 +5,19 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Connex.us</h1>
-    <div>
-        Welcome {{ user.nickname() }}
-        <a href="{{ logout_url }}">sign out</a>
-    </div>
-    <br>
-    <div>
-        Manage | <a href="/create_stream">Create</a> |
-        <a href="/view_all">View</a> |
-        <a href="/search_streams">Search</a> |
-        <a href="/trending">Trending</a> |
-        <a href="/social">Social</a>
-    </div>
+{#    <h1>Connex.us</h1>#}
+{#    <div>#}
+{#        Welcome {{ user.nickname() }}#}
+{#        <a href="{{ logout_url }}">sign out</a>#}
+{#    </div>#}
+{#    <br>#}
+{#    <div>#}
+{#        Manage | <a href="/create_stream">Create</a> |#}
+{#        <a href="/view_all">View</a> |#}
+{#        <a href="/search_streams">Search</a> |#}
+{#        <a href="/trending">Trending</a> |#}
+{#        <a href="/social">Social</a>#}
+{#    </div>#}
 
     <h2>Streams I own</h2>
     <form action="/delete_streams" method="post">

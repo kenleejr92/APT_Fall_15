@@ -2,19 +2,10 @@
 {% autoescape true %}
 <html>
   <body>
-    <h1>Trending Streams</h1>
-    <br>
-    <div>
-        <a href ="/management">Manage</a> | <a href="/create_stream">Create</a> |
-        <a href="/view_all">View</a> |
-        <a href="/search_streams">Search</a> |
-        Trending |
-        <a href="/social">Social</a>
-    </div>
-    <br>
+    <h2>Trending Streams</h2>
     <ul>
     {% for stream in streams %}
-        <li><a href="/view_stream/?stream_name={{ stream.name }}" >{{ stream.name }}</a></li>
+        <a href="/view_stream/?stream_name={{ stream.name }}" >{{ stream.name }}</a><br>
     {% endfor %}
     </ul>
   </body>
