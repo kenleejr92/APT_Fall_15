@@ -33,5 +33,11 @@ class SearchStreamHandler(webapp2.RequestHandler):
 
     def post(self):
         query_string = cgi.escape(self.request.get('query_string'))
-        goToStream = "/view_stream/?stream_name=" + query_string
-        self.redirect(goToStream)
+        queryStream = Stream.query(Stream.name == query_string)
+        entity = queryStream.get()
+        if entity is not None:
+            goToStream = "/view_stream/?stream_name=" + query_string
+            self.redirect(goToStream)
+        else:
+            self.response.write("That stream does not exist")
+
