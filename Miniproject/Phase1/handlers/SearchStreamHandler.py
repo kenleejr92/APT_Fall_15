@@ -11,7 +11,7 @@ from handlers.Stream import Stream
 
 #/search_streams
 class SearchStreamHandler(webapp2.RequestHandler):
-    def get(self):
+    def setup(self, currentTab):
         JINJA_ENVIRONMENT = jinja2.Environment(
         loader=jinja2.FileSystemLoader('templates'),
         extensions=['jinja2.ext.autoescape'],
@@ -45,8 +45,11 @@ class SearchStreamHandler(webapp2.RequestHandler):
 
         #test search header
         searchHead = JINJA_ENVIRONMENT.get_template('Header.html')
-        self.response.write(searchHead.render(current = 'search'))
+        self.response.write(searchHead.render(current = currentTab))
 
+
+    def get(self):
+        self.setup('search')
 
 
     def post(self):
