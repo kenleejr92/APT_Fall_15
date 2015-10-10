@@ -28,7 +28,7 @@ class SearchStreamHandler(webapp2.RequestHandler):
             'streams':streams
         }
 
-        template = JINJA_ENVIRONMENT.get_template('improvedSearch.html')
+        template = JINJA_ENVIRONMENT.get_template('Search.html')
         self.response.write(template.render(streams = json.dumps(streamNames)))
 
     def post(self):
