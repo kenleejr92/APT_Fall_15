@@ -17,6 +17,10 @@ class SearchStreamHandler(webapp2.RequestHandler):
         extensions=['jinja2.ext.autoescape'],
         autoescape=True)
 
+        #test search header
+        searchHead = JINJA_ENVIRONMENT.get_template('Header.html')
+        self.response.write(searchHead.render(current = 'search'))
+
         #Get the list of streams
         streams = Stream.query()
 
