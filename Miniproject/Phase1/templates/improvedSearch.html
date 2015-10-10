@@ -1,0 +1,36 @@
+<!doctype html>
+{% autoescape true %}
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <p id="demo"></p>
+
+    <script type="text/javascript">
+    var g = {{ streams|safe }}
+    </script>
+
+</head>
+<body>
+ 
+<label for="autocomplete">Search for a stream: </label>
+<input id="autocomplete">
+
+
+<script type="text/javascript">
+var allstreams = ["gucci"];
+var source =[""];
+$( "#autocomplete" ).autocomplete({
+
+    source: source.concat(g)
+{#    source : allstreams#}
+{#  source: [ "c++", "java", "php", "coldfusion", "javascript", "asp", "ruby" ]#}
+});
+</script>
+ 
+</body>
+</html>
+{% endautoescape %}
