@@ -15,19 +15,29 @@
 
 </head>
 <body>
- 
-<label for="autocomplete">Search for a stream: </label>
-<input id="autocomplete">
-
+    <h1>Connex.us</h1>
+    <br>
+    <div>
+        <a href="/management">Manage</a> | <a href="/create_stream">Create</a> |
+        <a href="/view_all">View</a> |
+        <a href="/search_streams">Search</a> |
+        <a href="/trending">Trending</a> |
+        Social
+    </div>
+    <br>
+    <div>
+    <form action="/social" method="post">
+        Search Streams:
+        <input id="autocomplete" type="text" name="query_string" value="Name">
+        <input type="submit">
+    </form>
+    </div>
+</body>
 
 <script type="text/javascript">
-var allstreams = ["gucci"];
 var source =[""];
 $( "#autocomplete" ).autocomplete({
-
     source: source.concat(g)
-{#    source : allstreams#}
-{#  source: [ "c++", "java", "php", "coldfusion", "javascript", "asp", "ruby" ]#}
 });
 </script>
  

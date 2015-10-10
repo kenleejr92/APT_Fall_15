@@ -30,20 +30,8 @@ class SocialHandler(webapp2.RequestHandler):
 
         template = JINJA_ENVIRONMENT.get_template('improvedSearch.html')
         self.response.write(template.render(streams = json.dumps(streamNames)))
-        #self.response.write(template.render())
 
-    # def post(self):
-    #     JINJA_ENVIRONMENT = jinja2.Environment(
-    #     loader=jinja2.FileSystemLoader('templates'),
-    #     extensions=['jinja2.ext.autoescape'],
-    #     autoescape=True)
-    #
-    #     query_string = cgi.escape(self.request.get('query_string'))
-    #     search_results = Stream.query(Stream.name == query_string)
-    #     template_values = {
-    #         'query_string':query_string,
-    #         'search_results':search_results
-    #     }
-    #
-    #     template = JINJA_ENVIRONMENT.get_template('SearchStreamsPage.html')
-    #     self.response.write(template.render(template_values))
+    def post(self):
+        query_string = cgi.escape(self.request.get('query_string'))
+        goToStream = "/view_stream/?stream_name=" + query_string
+        self.redirect(goToStream)
