@@ -1,6 +1,6 @@
 <!doctype html>
 {% autoescape true %}
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 
 <head>
   <meta charset="utf-8">
@@ -14,16 +14,9 @@
     </script>
 
 </head>
+
 <body>
-    <h1>Connex.us</h1>
-    <br>
-    <div>
-        <a href="/management">Manage</a> | <a href="/create_stream">Create</a> |
-        <a href="/view_all">View</a> |
-        Search |
-        <a href="/trending">Trending</a> |
-        <a href="/social">Social</a>
-    </div>
+
     <br>
     <div>
     <form action="/search_streams" method="post">
@@ -40,7 +33,6 @@ $( "#autocomplete" ).autocomplete({
     source: source.concat(g)
 });
 </script>
- 
-</body>
+
 </html>
 {% endautoescape %}

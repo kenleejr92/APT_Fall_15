@@ -1,0 +1,21 @@
+<!doctype html>
+{% extends "Base.html" %}
+{% autoescape true %}
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+
+{#{% block head %}#}
+{#{{ super() }}#}
+{#{% endblock %}#}
+
+<body>
+{% block h1 %}
+    <h1>Connex.us</h1>
+    <div>
+        Welcome {{ user.nickname() }}
+        <a href="{{ logout_url }}">sign out</a>
+    </div>
+{% endblock %}
+</body>
+</html>
+
+{% endautoescape %}

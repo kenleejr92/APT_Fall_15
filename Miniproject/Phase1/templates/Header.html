@@ -1,29 +1,9 @@
 <!doctype html>
+{% extends "Base.html" %}
 {% autoescape true %}
 <html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-  <p id="demo"></p>
-
-    <script type="text/javascript">
-    var g = {{ streams|safe }}
-    </script>
-
-</head>
 <body>
-    <div>
-    <form action="/search_streams" method="post">
-        <h1>Connex.us</h1>
-        <p align="left">Search:
-                <input id="autocomplete" type="text" name="query_string">
-                <input type="submit" value="Go to Stream">
-        </p>
-    </form>
-    </div>
+{% block b1 %}
 
     <br>
     <div>
@@ -44,74 +24,28 @@
         {% else %}
             View |
         {% endif %}
-{#        {% endelse %}#}
 
-{#        <a href="/management">Manage</a> |#}
-{#        <a href="/create_stream">Create</a> |#}
-{#        <a href="/view_all">View</a> |#}
         {% if current != "search" %}
             <a href="/search_streams">Search</a> |
         {% else %}
             Search |
         {% endif %}
 
-
-{#        Search |#}
         {% if current != "trending" %}
             <a href="/trending">Trending</a> |
         {% else %}
             Trending |
         {% endif %}
+
         {% if current != "social" %}
             <a href="/social">Social</a>
         {% else %}
             Social |
         {% endif %}
 
-
     </div>
+{% endblock %}
 </body>
 
-<script type="text/javascript">
-var source =[""];
-$( "#autocomplete" ).autocomplete({
-    source: source.concat(g)
-});
-</script>
-
-</body>
 </html>
 {% endautoescape %}
-
-
-
-
-{#<!DOCTYPE html>#}
-{#{% autoescape true %}#}
-{#<html lang="en">#}
-{#<head>#}
-{#    <meta charset="UTF-8">#}
-{#    <title></title>#}
-{#</head>#}
-{#<body>#}
-{#    #}
-
-{#<h1>Trending Streams</h1>#}
-{#    <br>#}
-{#        {% for tab in ["mana"] %}#}
-{#            <a href ="/management">Manage</a> |#}
-{#        {% endfor %}#}
-
-{#    <div>#}
-{#        <a href ="/management">Manage</a> | <a href="/create_stream">Create</a> |#}
-{#        <a href="/view_all">View</a> |#}
-{#        <a href="/search_streams">Search</a> |#}
-{#        Trending |#}
-{#        <a href="/social">Social</a>#}
-{#    </div>#}
-
-{##}
-{#    <br>#}
-{#</body>#}
-{#</html>#}
-{#{% endautoescape %}#}

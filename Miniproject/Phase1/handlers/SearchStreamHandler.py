@@ -17,9 +17,17 @@ class SearchStreamHandler(webapp2.RequestHandler):
         extensions=['jinja2.ext.autoescape'],
         autoescape=True)
 
-        #test search header
-        searchHead = JINJA_ENVIRONMENT.get_template('Header.html')
-        self.response.write(searchHead.render(current = 'search'))
+        user = users.get_current_user()
+        user_id = user.user_id()
+        logout_url = users.create_logout_url('/')
+
+        #welcome to Connexus
+        userInfo = {
+            'user':user,
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('Welcome.html')
+        self.response.write(template.render(userInfo))
 
         #Get the list of streams
         streams = Stream.query()
@@ -34,6 +42,12 @@ class SearchStreamHandler(webapp2.RequestHandler):
 
         template = JINJA_ENVIRONMENT.get_template('Search.html')
         self.response.write(template.render(streams = json.dumps(streamNames)))
+
+        #test search header
+        searchHead = JINJA_ENVIRONMENT.get_template('Header.html')
+        self.response.write(searchHead.render(current = 'search'))
+
+
 
     def post(self):
         query_string = cgi.escape(self.request.get('query_string'))
