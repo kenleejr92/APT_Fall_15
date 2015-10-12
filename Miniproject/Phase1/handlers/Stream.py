@@ -7,6 +7,7 @@ class Stream(ndb.Model):
     name = ndb.StringProperty()     #stream name
 
     photos = ndb.BlobKeyProperty(repeated=True) #photos in stream
+
     num_photos = ndb.IntegerProperty()  #number of photos in stream
     views = ndb.IntegerProperty()   #number of views of the stream
     view_queue = ndb.DateTimeProperty(repeated=True)
@@ -18,3 +19,8 @@ class Stream(ndb.Model):
 
     tags = ndb.StringProperty(repeated=True)    #list of tags
     cover_image = ndb.StringProperty()      #url to cover image
+
+class Photo(ndb.Model):
+    photo_blob_key = ndb.BlobKeyProperty()
+    photo_lat = ndb.FloatProperty()
+    photo_long = ndb.FloatProperty()
