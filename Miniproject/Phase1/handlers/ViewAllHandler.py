@@ -65,23 +65,6 @@ class ViewAllHandler(webapp2.RequestHandler):
         stream_key = ndb.Key(Stream,stream_name)
         stream = stream_key.get()
 
-
-        # if stream.owner_id == user.user_id() :
-        #     owner = True
-        # else :
-        #     owner = False
-        #     stream.views = stream.views + 1
-        #     stream.view_queue.append(datetime.datetime.now())
-        #     stream.put()
-
-        # photo_keys = stream.photos
-        # photo_urls = []
-        # for key in photo_keys:
-        #     photo_urls.append(images.get_serving_url(key))
-        #
-        #
-        # upload_url = blobstore.create_upload_url('/upload_photo/?stream_name=%s' % stream_name)
-
         #Get the list of streams
         my_streams = Stream.query(Stream.owner_id == user_id).order(Stream.timestamp)
         template_values = {
