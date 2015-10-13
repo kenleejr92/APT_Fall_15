@@ -1,11 +1,17 @@
 __author__ = 'kenlee'
 
 import webapp2
-import jinja2
 import json
 import os
-from Stream import Stream
+import cgi
+import jinja2
+import datetime
+from google.appengine.ext import blobstore
+from google.appengine.ext import ndb
+from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.api import images
 from google.appengine.api import users
+from Stream import Stream
 
 class ViewAllHandler(webapp2.RequestHandler):
     def setup(self, currentTab):
@@ -55,11 +61,36 @@ class ViewAllHandler(webapp2.RequestHandler):
         user = users.get_current_user()
         user_id = user.user_id()
 
+        stream_name = 'Cali'
+        stream_key = ndb.Key(Stream,stream_name)
+        stream = stream_key.get()
+
+
+        # if stream.owner_id == user.user_id() :
+        #     owner = True
+        # else :
+        #     owner = False
+        #     stream.views = stream.views + 1
+        #     stream.view_queue.append(datetime.datetime.now())
+        #     stream.put()
+
+        photo_keys = stream.photos
+        photo_urls = []
+        for key in photo_keys:
+            photo_urls.append(images.get_serving_url(key))
+
+
+        upload_url = blobstore.create_upload_url('/upload_photo/?stream_name=%s' % stream_name)
+
         #Get the list of streams
         my_streams = Stream.query(Stream.owner_id == user_id).order(Stream.timestamp)
         template_values = {
             'my_streams':my_streams,
+            'photo_urls': photo_urls
         }
 
-        template = JINJA_ENVIRONMENT.get_template('ViewAllStreamsPage.html')
+        # template = JINJA_ENVIRONMENT.get_template('ViewAllStreamsPage.html')
+        # self.response.write(template.render(template_values))
+
+        template = JINJA_ENVIRONMENT.get_template('PhotoAlbumStreams.html')
         self.response.write(template.render(template_values))
