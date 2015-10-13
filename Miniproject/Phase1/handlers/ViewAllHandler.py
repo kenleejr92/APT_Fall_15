@@ -74,23 +74,21 @@ class ViewAllHandler(webapp2.RequestHandler):
         #     stream.view_queue.append(datetime.datetime.now())
         #     stream.put()
 
-        photo_keys = stream.photos
-        photo_urls = []
-        for key in photo_keys:
-            photo_urls.append(images.get_serving_url(key))
-
-
-        upload_url = blobstore.create_upload_url('/upload_photo/?stream_name=%s' % stream_name)
+        # photo_keys = stream.photos
+        # photo_urls = []
+        # for key in photo_keys:
+        #     photo_urls.append(images.get_serving_url(key))
+        #
+        #
+        # upload_url = blobstore.create_upload_url('/upload_photo/?stream_name=%s' % stream_name)
 
         #Get the list of streams
         my_streams = Stream.query(Stream.owner_id == user_id).order(Stream.timestamp)
         template_values = {
             'my_streams':my_streams,
-            'photo_urls': photo_urls
+            'x':0
+            # 'photo_urls': photo_urls
         }
 
-        # template = JINJA_ENVIRONMENT.get_template('ViewAllStreamsPage.html')
-        # self.response.write(template.render(template_values))
-
-        template = JINJA_ENVIRONMENT.get_template('PhotoAlbumStreams.html')
+        template = JINJA_ENVIRONMENT.get_template('ViewAllStreamsPage.html')
         self.response.write(template.render(template_values))

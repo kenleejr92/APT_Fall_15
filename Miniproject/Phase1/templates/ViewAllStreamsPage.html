@@ -1,13 +1,39 @@
 <!DOCTYPE html>
 {% autoescape true %}
+
+
 <html>
+    <head>
+        <link href="../assets/css/lightbox.css" rel="stylesheet">
+
+    </head>
+
+
   <body>
     <h2>Streams I own</h2>
-    <ul>
+    <ul class="example-image-link">
     {% for stream in my_streams %}
-        <a href="/view_stream/?stream_name={{ stream.name }}" >{{ stream.name }}</a><br>
+         <div>
+
+             <p style="float: left; font-size: 9pt; text-align: center; width: 23%; margin-right: 1%; margin-bottom: 0.5em;">
+             <a href="/view_stream/?stream_name={{ stream.name }}" title= {{ stream.name }}>
+                    <img HEIGHT="150" WIDTH="150" style="width: 100%" src="{{ stream.cover_image }}" />
+{#                    <figcaption>{{ stream.name }}</figcaption>#}
+                    {{ stream.name }}
+             </a>
+             </p>
+
+        </div>
+
+
     {% endfor %}
+    <p style="clear: both;">
     </ul>
+
+</section>
+
+  <script src="../assets/js/lightbox.js"></script>
+
   </body>
 </html>
 {% endautoescape %}
