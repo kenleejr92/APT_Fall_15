@@ -9,7 +9,10 @@
 {% endblock %}
 
 {% block body %}
-        <h1>Welcome to {{ stream_name }}</h1>
+        <h2>Welcome to {{ stream_name }}
+            <p style="font-size: 9pt"><a href="/view_all">  Back to all streams</a></p>
+        </h2>
+
         <div>
 
         {% for key in photo_urls %}
@@ -21,6 +24,10 @@
         {% endfor %}
         <p style="clear: both;">
         </div>
+
+        <form href="/view_stream/?stream_name={{ stream_name }}" method="post">
+            <input type="submit" value="More pictures">
+        </form>
 
         {% if owner %}
         <h2>Upload a Photo</h2>

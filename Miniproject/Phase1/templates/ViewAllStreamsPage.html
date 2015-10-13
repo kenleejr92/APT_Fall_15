@@ -1,14 +1,25 @@
 <!DOCTYPE html>
+{% extends "Base.html" %}
+
+{% block head %}
+{{ super() }}
+<script src="/js/dropzone.js"></script>
+<link href="/css/dropzone.css" rel="stylesheet">
+<script src="/js/lightbox.js"></script>
+<link href="/css/lightbox.css" rel="stylesheet">
+{% endblock %}
+
 {% autoescape true %}
 
 
 <html>
-    <head>
-        <link href="../assets/css/lightbox.css" rel="stylesheet">
 
-    </head>
+{#    <head>#}
+{#        <link href="../assets/css/lightbox.css" rel="stylesheet">#}
+{##}
+{#    </head>#}
 
-
+{% block h %}
   <body>
     <h2>Streams I own</h2>
     <ul class="example-image-link">
@@ -17,7 +28,7 @@
 
              <p style="float: left; font-size: 9pt; text-align: center; width: 23%; margin-right: 1%; margin-bottom: 0.5em;">
              <a href="/view_stream/?stream_name={{ stream.name }}" title= {{ stream.name }}>
-                    <img HEIGHT="150" WIDTH="150" style="width: 100%" src="{{ stream.cover_image }}" />
+                    <img HEIGHT="150" WIDTH="150" style="width: 100%" src="{{ stream.cover_image }}" class="img-thumbnail"/>
 {#                    <figcaption>{{ stream.name }}</figcaption>#}
                     {{ stream.name }}
              </a>
@@ -32,8 +43,9 @@
 
 </section>
 
-  <script src="../assets/js/lightbox.js"></script>
+{#  <script src="../assets/js/lightbox.js"></script>#}
 
   </body>
+{% endblock %}
 </html>
 {% endautoescape %}

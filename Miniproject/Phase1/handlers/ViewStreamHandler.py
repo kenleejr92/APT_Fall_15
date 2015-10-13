@@ -13,6 +13,8 @@ import json
 
 #/view_stream/stream_name
 class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler):
+    # input_values = {}
+
     def setup(self, currentTab):
         JINJA_ENVIRONMENT = jinja2.Environment(
         loader=jinja2.FileSystemLoader('templates'),
@@ -74,12 +76,23 @@ class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler):
             stream.put()
 
         photo_keys = stream.photos
-        photo_urls = []
+        all_photos = []
         for key in photo_keys:
-            photo_urls.append(images.get_serving_url(key))
-
+            all_photos.append(images.get_serving_url(key))
 
         upload_url = blobstore.create_upload_url('/upload_photo/?stream_name=%s' % stream_name)
+
+        # self.input_values = {
+        #     'owner':owner,
+        #     'stream_name':stream_name,
+        #     'photo_urls':all_photos,
+        #     'upload_url':upload_url
+        # }
+
+        photo_urls = []
+        for x in range(0,4):
+            if(len(all_photos)>0):photo_urls.append(all_photos.pop())
+
 
         template_values = {
             'owner':owner,
@@ -90,3 +103,45 @@ class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler):
 
         template = JINJA_ENVIRONMENT.get_template('ViewSingleStreamPage.html')
         self.response.write(template.render(template_values))
+
+    def post(self):
+        self.setup('view')
+
+        JINJA_ENVIRONMENT = jinja2.Environment(
+        loader=jinja2.FileSystemLoader('templates'),
+        extensions=['jinja2.ext.autoescape'],
+        autoescape=True)
+
+        user = users.get_current_user()
+
+        stream_name = cgi.escape(self.request.get('stream_name'))
+        stream_key = ndb.Key(Stream,stream_name)
+        stream = stream_key.get()
+
+
+        if stream.owner_id == user.user_id() :
+            owner = True
+        else :
+            owner = False
+            stream.views = stream.views + 1
+            stream.view_queue.append(datetime.datetime.now())
+            stream.put()
+
+        photo_keys = stream.photos
+        all_photos = []
+        for key in photo_keys:
+            all_photos.append(images.get_serving_url(key))
+
+        all_photos.reverse()
+
+        upload_url = blobstore.create_upload_url('/upload_photo/?stream_name=%s' % stream_name)
+
+        input_values = {
+            'owner':owner,
+            'stream_name':stream_name,
+            'photo_urls':all_photos,
+            'upload_url':upload_url
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('ViewSingleStreamPage.html')
+        self.response.write(template.render(input_values))
