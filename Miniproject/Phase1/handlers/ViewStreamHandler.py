@@ -3,12 +3,19 @@ __author__ = 'kenlee'
 import cgi
 import jinja2
 import datetime
+from datetime import timedelta
+from random import randint
 from google.appengine.ext import blobstore
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.api import images
 from google.appengine.api import users
 from Stream import Stream
+
+
+
+def random_date(start, end):
+    return start + timedelta(seconds=randint(0, int((end - start).total_seconds())))
 
 #/view_stream/stream_name
 class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler):
@@ -34,9 +41,15 @@ class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler):
             stream.put()
 
         photo_keys = stream.photos
-        photo_urls = []
+
+
+        photo_objs = []
         for key in photo_keys:
-            photo_urls.append(images.get_serving_url(key))
+            photo_objs.append({'url': images.get_serving_url(key),
+                               'lat': -25.363,
+                               'long': 131.044,
+                               'date': random_date(datetime.date(2015,1,1),datetime.date(2015,12,25))
+                               })
 
 
         upload_url = blobstore.create_upload_url('/upload_photo/?stream_name=%s' % stream_name)
@@ -44,7 +57,7 @@ class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler):
         template_values = {
             'owner':owner,
             'stream_name':stream_name,
-            'photo_urls':photo_urls,
+            'photo_objs':photo_objs,
             'upload_url':upload_url
         }
 

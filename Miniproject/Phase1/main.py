@@ -38,5 +38,5 @@ app = webapp2.WSGIApplication([('/', MainPageHandler),
                                ('/email',EmailHandler),
                                ('/delete_streams',DeleteStreamsHandler),
                                ('/unsubscribe_streams',UnsubscribeHandler),
-                               ('/view_map',ViewMapHandler),
+                               ('/view_map/.*',ViewMapHandler),
                               ], debug=True)

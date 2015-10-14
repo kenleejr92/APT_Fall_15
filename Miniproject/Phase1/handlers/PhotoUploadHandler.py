@@ -18,7 +18,6 @@ class PhotoUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             stream_key = ndb.Key(Stream,stream_name)
             stream = stream_key.get()
             stream.photos.append(blob_key)
-            updatedNum = stream.num_photos + 1
             stream.num_photos += 1
             stream.date_last_added = datetime.date.today()
             stream.put()
