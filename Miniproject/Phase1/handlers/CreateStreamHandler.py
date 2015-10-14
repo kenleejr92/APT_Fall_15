@@ -82,8 +82,11 @@ class CreateStreamHandler(webapp2.RequestHandler):
         email.sender = user.email()
         email.subject = "'Notification of Subscription to %s'" % stream_name
         email.body = message
+        subscriber_ids=[]
         for subscriber in subscribers:
             if len(subscriber)!=0:
+                sub_id = users.User(subscriber).user_id()
+                subscriber_ids.append("%s" % sub_id)
                 email.to = "%s" % subscriber
                 email.send()
 
@@ -96,7 +99,7 @@ class CreateStreamHandler(webapp2.RequestHandler):
             #Add stream to the datastore
             user = users.get_current_user()
             new_stream = Stream(owner_id = user.user_id(),name=stream_name,photos=[], num_photos = 0, views=0,  view_queue=[],
-                                subscribed_users=subscribers,timestamp = datetime.datetime.now(), tags = tags, cover_image=cover_image)
+                                subscribed_users=subscriber_ids,timestamp = datetime.datetime.now(), tags = tags, cover_image=cover_image)
             new_stream.key = ndb.Key(Stream, stream_name)
             new_stream.put()
 

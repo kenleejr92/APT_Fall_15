@@ -51,8 +51,8 @@
             <h2 class="text-center">Upload a Photo</h2>
             <form action="{{ upload_url }}" method="POST" class="dropzone" enctype="multipart/form-data"></form>
             {% else %}
-            <h2>Subscribe</h2>
-            <form action="/subscribe" method="POST">
+            <h2 class="text-center">Subscribe</h2>
+            <form class="text-center" action="/subscribe" method="POST">
                 <input type="submit" name="submit" value="Subscribe to {{ stream_name }}">
             </form>
         {% endif %}

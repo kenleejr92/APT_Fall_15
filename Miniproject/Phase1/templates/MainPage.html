@@ -1,12 +1,24 @@
-<!DOCTYPE html>
-{% autoescape true %}
-<html>
-  <body>
-    <h1>Welcome To Connexus!</h1>
-    <h2>Share The World!</h2>
-    <div>
-        <a href="{{ login_url }}">Sign in or register</a>
+{% extends "Base.html" %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+
+{% block body %}
+<div class="container-fluid">
+  <div class="row">
+    <h1 class="text-center">Welcome To Connexus!</h1>
+  </div>
+  <div class="row">
+    <h2 class="text-center">Share The World!</h2>
+  </div>
+  <div class="row">
+    <div class="text-center">
+    <a class="text-center" href="{{ login_url }}">Sign in or register</a>
     </div>
-  </body>
-</html>
-{% endautoescape %}
+  </div>
+</div>
+{% endblock %}
+
+
