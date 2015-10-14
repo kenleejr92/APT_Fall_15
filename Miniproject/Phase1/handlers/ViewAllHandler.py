@@ -27,7 +27,9 @@ class ViewAllHandler(webapp2.RequestHandler):
         #welcome to Connexus
         userInfo = {
             'user':user,
+            'logout_url': logout_url
         }
+
 
         template = JINJA_ENVIRONMENT.get_template('Welcome.html')
         self.response.write(template.render(userInfo))
@@ -66,8 +68,6 @@ class ViewAllHandler(webapp2.RequestHandler):
         my_streams = Stream.query(Stream.owner_id == user_id).order(Stream.timestamp)
         template_values = {
             'my_streams':my_streams,
-            'x':0
-            # 'photo_urls': photo_urls
         }
 
         template = JINJA_ENVIRONMENT.get_template('ViewAllStreamsPage.html')

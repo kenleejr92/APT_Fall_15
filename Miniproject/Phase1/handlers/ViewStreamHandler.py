@@ -35,7 +35,9 @@ class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler):
         #welcome to Connexus
         userInfo = {
             'user':user,
+            'logout_url': logout_url
         }
+
 
         template = JINJA_ENVIRONMENT.get_template('Welcome.html')
         self.response.write(template.render(userInfo))
@@ -94,6 +96,10 @@ class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler):
                                'date': random_date(datetime.date(2015,12,1),datetime.date(2015,12,25))
                                })
 
+        less_objs = []
+        for x in range(0,4):
+            if(len(photo_objs)>0):less_objs.append(photo_objs.pop())
+
 
         upload_url = blobstore.create_upload_url('/upload_photo/?stream_name=%s' % stream_name)
 
@@ -101,7 +107,7 @@ class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler):
         template_values = {
             'owner':owner,
             'stream_name':stream_name,
-            'photo_objs':photo_objs,
+            'photo_objs':less_objs,
             'upload_url':upload_url
         }
 

@@ -24,7 +24,9 @@ class CreateStreamHandler(webapp2.RequestHandler):
         #welcome to Connexus
         userInfo = {
             'user':user,
+            'logout_url': logout_url
         }
+
 
         template = JINJA_ENVIRONMENT.get_template('Welcome.html')
         self.response.write(template.render(userInfo))
