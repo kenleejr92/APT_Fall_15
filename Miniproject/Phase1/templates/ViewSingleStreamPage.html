@@ -21,22 +21,28 @@
 {% endblock %}
 
 {% block body %}
-        <h2>Welcome to {{ stream_name }}
-            <p style="font-size: 9pt"><a href="/view_all">  Back to all streams</a></p>
-        </h2>
-        <div class="container">
+<div class="container-fluid">
+        <div class="row">
+        <h2 class="text-center">Welcome to {{ stream_name }}</h2>
+        </div>
+        <div class="row">
         {% for photo_obj in photo_objs %}
              <a href="{{ photo_obj.url }}" data-lightbox="stream">
                      <img src="{{ photo_obj.url }}" class="img-thumbnail stream_img"
                           lat="{{ photo_obj.lat }}" lng="{{ photo_obj.long }}" date="{{ photo_obj.date }}"
-                             style="height:100px;width:100px"/>
+                             style="HEIGHT:300px;WIDTH:300px"/>
              </a>
         {% endfor %}
         </div>
+        <div class="row">
+            <form class="text-center" href="/view_stream/?stream_name={{ stream_name }}" method="post">
+                <input class="btn-lg" type="submit" value="More pictures">
+            </form>
+            <form class="text-center" href="/view_all" method="get">
+                <input class="btn-lg" type="submit" value="Back to My Streams">
+            </form>
+        </div>
 
-        <form href="/view_stream/?stream_name={{ stream_name }}" method="post">
-            <input type="submit" value="More pictures">
-        </form>
 
         {% if owner %}
         <h2>Upload a Photo</h2>
@@ -50,7 +56,7 @@
         <div id="dateSlider"></div>
         <br>
         <div id="map-canvas" style="width:70%;height:600px"></div>
-
+</div>
 {% endblock %}
 
 {% block endScripts %}

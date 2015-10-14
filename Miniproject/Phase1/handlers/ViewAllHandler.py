@@ -61,9 +61,6 @@ class ViewAllHandler(webapp2.RequestHandler):
         user = users.get_current_user()
         user_id = user.user_id()
 
-        stream_name = 'Cali'
-        stream_key = ndb.Key(Stream,stream_name)
-        stream = stream_key.get()
 
         #Get the list of streams
         my_streams = Stream.query(Stream.owner_id == user_id).order(Stream.timestamp)
