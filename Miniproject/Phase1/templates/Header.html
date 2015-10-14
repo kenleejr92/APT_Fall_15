@@ -6,44 +6,42 @@
 {% block b1 %}
 
     <br>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+
     <div>
+        <ul class="nav navbar-nav">
         {% if current != "manage" %}
-            <a href="/management">Manage</a> |
+            <li><a href="/management" class="navbar-link">Manage</a></li>
         {% else %}
-            Manage |
+            <li><p class="navbar-text">Manage</p></li>
         {% endif %}
 
         {% if current != "create" %}
-            <a href="/create_stream">Create</a> |
+            <li><a href="/create_stream" class="navbar-link">Create</a></li>
         {% else %}
-            Create |
+            <li><p class="navbar-text">Create</p></li>
         {% endif %}
 
         {% if current != "view" %}
-            <a href="/view_all">View</a> |
+            <li><a href="/view_all" class="navbar-link">View</a></li>
         {% else %}
-            View |
+            <li><p class="navbar-text">View</p></li>
         {% endif %}
-
-{#        {% if current != "search" %}#}
-{#            <a href="/search_streams">Search</a> |#}
-{#        {% else %}#}
-{#            Search |#}
-{#        {% endif %}#}
 
         {% if current != "trending" %}
-            <a href="/trending">Trending</a> |
+            <li><a href="/trending" class="navbar-link">Trending</a></li>
         {% else %}
-            Trending |
+            <li><p class="navbar-text">Trending</p></li>
         {% endif %}
-
-{#        {% if current != "social" %}#}
-{#            <a href="/social">Social</a>#}
-{#        {% else %}#}
-{#            Social |#}
-{#        {% endif %}#}
+        </ul>
 
     </div>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
 {% endblock %}
 </body>
 

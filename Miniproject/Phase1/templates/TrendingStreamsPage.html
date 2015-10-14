@@ -5,7 +5,10 @@
     <h2>Trending Streams</h2>
     <ul>
     {% for stream in streams %}
-        <a href="/view_stream/?stream_name={{ stream.name }}" >{{ stream.name }}</a><br>
+        <a href="/view_stream/?stream_name={{ stream.name }}" >
+          <img src="{{ stream.cover_image }}" style="width: 100px;height: 100px">
+        </a>
+      <br>
     {% endfor %}
     </ul>
   </body>

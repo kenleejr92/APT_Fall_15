@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 {% autoescape true %}
-<html lang="en">
+<html>
 <head>
     {% block head %}
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="/js/jquery-2.1.4.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/js/bootstrap.min.js"></script>
     {% endblock %}
@@ -14,5 +14,7 @@
     {% block body %}
     {% endblock %}
 </body>
+{% block endScripts %}
+{% endblock %}
 </html>
 {% endautoescape %}

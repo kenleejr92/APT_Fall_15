@@ -9,11 +9,13 @@
 
 <body>
 {% block h1 %}
-    <h1>Connex.us</h1>
-    <div>
+<div class="container-fluid">
+    <h1 class="text-center">Connex.us</h1>
+    <div class="text-left">
         Welcome {{ user.nickname() }}
         <a href="{{ logout_url }}">sign out</a>
     </div>
+</div>
 {% endblock %}
 </body>
 </html>

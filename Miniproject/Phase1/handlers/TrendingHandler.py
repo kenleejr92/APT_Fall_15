@@ -55,6 +55,7 @@ class TrendingHandler(webapp2.RequestHandler):
         #Get the list of streams
         streams = Stream.query().order(-Stream.views)
 
+
         template_values = {
             'streams':streams
         }
