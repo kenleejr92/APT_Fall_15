@@ -48,7 +48,7 @@ class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler):
             photo_objs.append({'url': images.get_serving_url(key),
                                'lat': -25.363,
                                'long': 131.044,
-                               'date': random_date(datetime.date(2015,1,1),datetime.date(2015,12,25))
+                               'date': random_date(datetime.date(2015,12,1),datetime.date(2015,12,25))
                                })
 
 

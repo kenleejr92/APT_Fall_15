@@ -4,7 +4,9 @@
 
 var photo_objs=[];
 var markers = [];
-var map;
+var markerCluster;
+var gmap;
+
 
 
 
@@ -45,6 +47,7 @@ $(document).ready(function() {
 		function initMap() {
 		  $('#map-canvas').gmap({'zoom': 2, 'disableDefaultUI':true}).bind('init', function(evt, map) {
             console.log(photo_objs);
+            gmap = map;
 			var bounds = map.getBounds();
 			var southWest = bounds.getSouthWest();
 			var northEast = bounds.getNorthEast();
@@ -54,7 +57,7 @@ $(document).ready(function() {
 				var lat = southWest.lat() + latSpan * Math.random();
 				var lng = southWest.lng() + lngSpan * Math.random();
 				var point = new google.maps.LatLng(lat,lng);
-				var marker = new google.maps.Marker({map:map, position:point, clickable:true});
+				var marker = new google.maps.Marker({map:map, position:point, clickable:true, date:photo_objs[i].date});
 				var infowindow = new google.maps.InfoWindow();
                 var photo_url = photo_objs[i].photo_url;
 				google.maps.event.addListener(marker,'click',(function(marker, photo_url, infowindow) {
@@ -67,7 +70,7 @@ $(document).ready(function() {
 				markers.push(marker);
 			}
 
-			var markerCluster = new MarkerClusterer(map, markers);
+			markerCluster = new MarkerClusterer(map, markers);
 		  });
 		}
 
@@ -81,9 +84,18 @@ $(document).ready(function() {
         $("#dateSlider").bind("valuesChanged", function(e, data){
             var min = data.values.min;
             var max = data.values.max;
-            console.log("Values just changed. min: " + data.values.min + " max: " + data.values.max);
-            markers[0].setMap(null);
-
+            console.log("Minimum Date: " + min);
+            console.log("Maximum Date: " + max);
+            for(var i=0; i<markers.length; i++){
+                console.log("Marker " + i + " Date: "+ markers[i].date);
+                if((markers[i].date < min) || (markers[i].date > max)){
+                    console.log("Marker Go Away!");
+                    markers[i].setMap(null);
+                }else{
+                    console.log("Marker Come Back!");
+                    markers[i].setMap(gmap);
+                }
+            };
         });
 
 		initMap();
