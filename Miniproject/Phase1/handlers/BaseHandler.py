@@ -50,3 +50,7 @@ class BaseHandler():
         #test search header
         searchHead = JINJA_ENVIRONMENT.get_template('Header.html')
         self.response.write(searchHead.render(current = currentTab))
+
+    def errorpage(self, msg):
+        self.cache('')
+        self.response.write(msg)

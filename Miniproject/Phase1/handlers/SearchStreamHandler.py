@@ -37,7 +37,7 @@ class SearchStreamHandler(webapp2.RequestHandler, BaseHandler):
                 goToStream = "/view_stream/?stream_name=" + str(tagToStream[0].name)
                 self.redirect(goToStream)
             else:
-                self.response.write("That #tag does not exist")
+                self.errorpage("That query does not exist")
 
         else:
             queryStream = Stream.query(Stream.name == query_string)
@@ -46,7 +46,7 @@ class SearchStreamHandler(webapp2.RequestHandler, BaseHandler):
                 goToStream = "/view_stream/?stream_name=" + query_string
                 self.redirect(goToStream)
             else:
-                self.response.write("That stream does not exist")
+                self.errorpage("That query does not exist")
 
     def multiple(self, tagname, streams):
         self.cache('')
