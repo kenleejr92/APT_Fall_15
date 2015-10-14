@@ -54,6 +54,8 @@ class CreateStreamHandler(webapp2.RequestHandler, BaseHandler):
                 email.send()
 
         #stream already exists
+        if not stream_name:
+            self.redirect('/error')
         stream = Stream.query(Stream.name == stream_name).get()
         if stream:
             self.redirect('/error')

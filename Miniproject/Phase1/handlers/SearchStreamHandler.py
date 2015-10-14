@@ -18,35 +18,38 @@ class SearchStreamHandler(webapp2.RequestHandler, BaseHandler):
 
     def post(self):
         query_string = cgi.escape(self.request.get('query_string'))
-        if(query_string[0]=='#'):
-            #self.response.write("TAGGG")
-            queryAll = Stream.query()
-            tagToStream = []
-            for query in queryAll:
-                tags = query.tags
-                for tag in tags:
-                    if(query_string==tag):
-                        #self.response.write(tag[0:])
-                        tagToStream.append(query)
-
-            # for streamName in tagToStream:
-            #     self.response.write(streamName + " ")
-
-            if(len(tagToStream)>1):self.multiple(query_string, tagToStream)
-            elif(len(tagToStream)==1):
-                goToStream = "/view_stream/?stream_name=" + str(tagToStream[0].name)
-                self.redirect(goToStream)
-            else:
+        if not query_string :
                 self.errorpage("That query does not exist")
-
         else:
-            queryStream = Stream.query(Stream.name == query_string)
-            entity = queryStream.get()
-            if entity is not None:
-                goToStream = "/view_stream/?stream_name=" + query_string
-                self.redirect(goToStream)
+            if(query_string[0]=='#'):
+                #self.response.write("TAGGG")
+                queryAll = Stream.query()
+                tagToStream = []
+                for query in queryAll:
+                    tags = query.tags
+                    for tag in tags:
+                        if(query_string==tag):
+                            #self.response.write(tag[0:])
+                            tagToStream.append(query)
+
+                # for streamName in tagToStream:
+                #     self.response.write(streamName + " ")
+
+                if(len(tagToStream)>1):self.multiple(query_string, tagToStream)
+                elif(len(tagToStream)==1):
+                    goToStream = "/view_stream/?stream_name=" + str(tagToStream[0].name)
+                    self.redirect(goToStream)
+                else:
+                    self.errorpage("That query does not exist")
+
             else:
-                self.errorpage("That query does not exist")
+                queryStream = Stream.query(Stream.name == query_string)
+                entity = queryStream.get()
+                if entity is not None:
+                    goToStream = "/view_stream/?stream_name=" + query_string
+                    self.redirect(goToStream)
+                else:
+                    self.errorpage("That query does not exist")
 
     def multiple(self, tagname, streams):
         self.cache('')
