@@ -5,8 +5,10 @@
     <string name="sign_out_button_name">Sign out</string>
     <string name="revoke_access_button_name">Revoke</string>
     <string name="status_signed_out">Signed out</string>
-    <string name="welcome">Welcome Connexus</string>
-    <string name="imagePage">View All Images</string>
+    <string name="welcome">Welcome To Connexus</string>
+    <string name="imagePage">View All Streams</string>
     <string name="uploadImageActivity"> Upload a new image</string>
+    <string name="title_activity_main_activity2">MainActivity2Activity</string>
+    <string name="title_activity_view_streams">ViewStreams</string>
 
 </resources>

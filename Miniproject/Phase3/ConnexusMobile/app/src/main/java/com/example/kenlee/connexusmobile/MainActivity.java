@@ -374,8 +374,8 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     public void viewAllImages(View view) {
-//        Intent intent = new Intent(this, DisplayImages.class);
-//        startActivity(intent);
+        Intent intent = new Intent(this, ViewStreams.class);
+        startActivity(intent);
     }
 
 }
