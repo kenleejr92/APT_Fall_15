@@ -1,8 +1,7 @@
 #!/usr/bin/python
 
 import webapp2
-import jinja2
-import os
+
 
 from handlers.MainPageHandler import MainPageHandler
 from handlers.CreateStreamHandler import CreateStreamHandler
@@ -20,7 +19,7 @@ from handlers.EmailHandler import EmailHandler
 from handlers.DeleteStreamsHandler import DeleteStreamsHandler
 from handlers.UnsubscribeHandler import UnsubscribeHandler
 from handlers.ViewMapHandler import ViewMapHandler
-
+from handlers.ViewStreamsMobileHandler import ViewStreamsMobileHandler
 
 
 app = webapp2.WSGIApplication([('/', MainPageHandler),
@@ -39,4 +38,5 @@ app = webapp2.WSGIApplication([('/', MainPageHandler),
                                ('/delete_streams',DeleteStreamsHandler),
                                ('/unsubscribe_streams',UnsubscribeHandler),
                                ('/view_map/.*',ViewMapHandler),
+                               ('/view_streams_mobile',ViewStreamsMobileHandler),
                               ], debug=True)
