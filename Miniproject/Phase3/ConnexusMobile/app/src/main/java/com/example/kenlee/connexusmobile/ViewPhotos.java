@@ -2,10 +2,9 @@ package com.example.kenlee.connexusmobile;
 
 import android.app.Dialog;
 import android.content.Context;
-
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,15 +27,18 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 
-public class ViewStreams extends ActionBarActivity {
+public class ViewPhotos extends ActionBarActivity {
     Context context = this;
-    private String TAG  = "Display Streams";
+    private String TAG  = "Display Photos";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_streams);
-        final String request_url = "http://apt15connexus.appspot.com/view_streams_mobile";
+        setContentView(R.layout.activity_view_photos);
+        Intent intent = getIntent();
+        String stream_name = intent.getExtras().getString("stream_name");
+        final String request_url = "http://apt15connexus.appspot.com/view_photos_mobile/?stream_name=" + stream_name;
+
         AsyncHttpClient httpClient = new AsyncHttpClient();
         httpClient.get(request_url, new AsyncHttpResponseHandler() {
             @Override
@@ -45,14 +47,14 @@ public class ViewStreams extends ActionBarActivity {
                 final ArrayList<String> imageCaps = new ArrayList<String>();
                 try {
                     JSONObject jObject = new JSONObject(new String(response));
-                    JSONArray stream_names = jObject.getJSONArray("stream_names");
+                    //JSONArray stream_names = jObject.getJSONArray("stream_names");
                     JSONArray image_urls = jObject.getJSONArray("image_urls");
                     //JSONArray displayCaption = jObject.getJSONArray("imageCaptionList");
 
-                    for (int i = 0; i < stream_names.length(); i++) {
+                    for (int i = 0; i < image_urls.length(); i++) {
 
                         imageURLs.add(image_urls.getString(i));
-                        imageCaps.add(stream_names.getString(i));
+                        //imageCaps.add(stream_names.getString(i));
                         System.out.println(image_urls.getString(i));
                     }
                     GridView gridview = (GridView) findViewById(R.id.gridview);
@@ -61,11 +63,17 @@ public class ViewStreams extends ActionBarActivity {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View v,
                                                 int position, long id) {
-                            //start view photos activity
-                            Intent intent = new Intent(context, ViewPhotos.class);
-                            String stream_name = imageCaps.get(position);
-                            intent.putExtra("stream_name", stream_name);
-                            startActivity(intent);
+
+                           // Toast.makeText(context, imageCaps.get(position), Toast.LENGTH_SHORT).show();
+
+                            Dialog imageDialog = new Dialog(context);
+                            imageDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                            imageDialog.setContentView(R.layout.thumbnail);
+                            ImageView image = (ImageView) imageDialog.findViewById(R.id.thumbnail_IMAGEVIEW);
+
+                            Picasso.with(context).load(imageURLs.get(position)).into(image);
+
+                            imageDialog.show();
                         }
                     });
                 } catch (JSONException j) {
@@ -84,7 +92,7 @@ public class ViewStreams extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_view_streams, menu);
+        getMenuInflater().inflate(R.menu.menu_view_photos, menu);
         return true;
     }
 
