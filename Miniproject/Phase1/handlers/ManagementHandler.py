@@ -4,6 +4,7 @@ import webapp2
 import jinja2
 import json
 from Stream import Stream
+from Stream import Photo
 from google.appengine.api import users
 from BaseHandler import BaseHandler
 

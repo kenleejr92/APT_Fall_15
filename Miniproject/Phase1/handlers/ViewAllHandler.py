@@ -12,6 +12,7 @@ from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.api import images
 from google.appengine.api import users
 from Stream import Stream
+from Stream import Photo
 from BaseHandler import BaseHandler
 
 class ViewAllHandler(webapp2.RequestHandler,BaseHandler):
@@ -25,7 +26,6 @@ class ViewAllHandler(webapp2.RequestHandler,BaseHandler):
 
         user = users.get_current_user()
         user_id = user.user_id()
-
 
         #Get the list of streams
         my_streams = Stream.query(Stream.owner_id == user_id).order(Stream.timestamp)

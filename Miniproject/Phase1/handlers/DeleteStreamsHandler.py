@@ -3,6 +3,7 @@ __author__ = 'kenlee'
 import webapp2
 import cgi
 from Stream import Stream
+from Stream import Photo
 from google.appengine.ext import ndb
 
 class DeleteStreamsHandler(webapp2.RequestHandler):

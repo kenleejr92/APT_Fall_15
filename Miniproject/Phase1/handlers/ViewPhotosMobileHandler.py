@@ -3,6 +3,7 @@ __author__ = 'kenlee'
 import webapp2
 import json
 from Stream import Stream
+from Stream import Photo
 import cgi
 from google.appengine.ext import blobstore
 from google.appengine.ext import ndb

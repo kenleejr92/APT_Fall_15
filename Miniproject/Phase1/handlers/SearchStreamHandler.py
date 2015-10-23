@@ -8,6 +8,7 @@ from google.appengine.ext import blobstore
 from google.appengine.ext import ndb
 from google.appengine.api import users
 from handlers.Stream import Stream
+from Stream import Photo
 from BaseHandler import BaseHandler
 
 #/search_streams

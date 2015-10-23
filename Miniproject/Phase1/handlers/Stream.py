@@ -1,13 +1,17 @@
 __author__ = 'kenlee'
 
 from google.appengine.ext import ndb
+class Photo(ndb.Model):
+    url = ndb.StringProperty()  #photo url
+    lat = ndb.FloatProperty()         #photo latitude
+    lng = ndb.FloatProperty()        #photo longitude
+    date = ndb.DateProperty()         #photo date
 
 class Stream(ndb.Model):
     owner_id = ndb.StringProperty() #owner
     name = ndb.StringProperty()     #stream name
 
-    photos = ndb.BlobKeyProperty(repeated=True) #photos in stream
-    #photos = ndb.StructuredProperty(Photo, repeated=true)
+    photos = ndb.StructuredProperty(Photo, repeated=True)
 
     num_photos = ndb.IntegerProperty()  #number of photos in stream
     views = ndb.IntegerProperty()   #number of views of the stream
@@ -21,8 +25,3 @@ class Stream(ndb.Model):
     tags = ndb.StringProperty(repeated=True)    #list of tags
     cover_image = ndb.StringProperty()      #url to cover image
 
-class Photo(ndb.Model):
-    photo_title = ndb.StringProperty()      #photo title
-    photo_blob_key = ndb.BlobKeyProperty()  #photo blob key
-    photo_lat = ndb.FloatProperty()         #photo latitude
-    photo_long = ndb.FloatProperty()        #photo longitude

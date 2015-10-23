@@ -11,6 +11,7 @@ from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.api import images
 from google.appengine.api import users
 from Stream import Stream
+from Stream import Photo
 import json
 from BaseHandler import BaseHandler
 
@@ -48,30 +49,14 @@ class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler, BaseHandler
             stream.view_queue.append(datetime.datetime.now())
             stream.put()
 
-        photo_keys = stream.photos
-
-
-
-        photo_objs = []
-        for key in photo_keys:
-            photo_objs.append({'url': images.get_serving_url(key),
-                               'lat': -25.363,
-                               'long': 131.044,
-                               'date': random_date(datetime.date(2015,12,1),datetime.date(2015,12,25))
-                               })
-
-        less_objs = []
-        for x in range(0,4):
-            if(len(photo_objs)>0):less_objs.append(photo_objs.pop())
-
-
+        photo_objs = stream.photos
         upload_url = blobstore.create_upload_url('/upload_photo/?stream_name=%s' % stream_name)
 
 
         template_values = {
             'owner':owner,
             'stream_name':stream_name,
-            'photo_objs':less_objs,
+            'photo_objs':photo_objs,
             'upload_url':upload_url
         }
 
@@ -101,16 +86,7 @@ class ViewStreamHandler(blobstore_handlers.BlobstoreDownloadHandler, BaseHandler
             stream.view_queue.append(datetime.datetime.now())
             stream.put()
 
-        photo_keys = stream.photos
-        photo_objs = []
-        for key in photo_keys:
-            photo_objs.append({'url': images.get_serving_url(key),
-                               'lat': -25.363,
-                               'long': 131.044,
-                               'date': random_date(datetime.date(2015,12,1),datetime.date(2015,12,25))
-                               })
-
-
+        photo_objs = stream.photos
         upload_url = blobstore.create_upload_url('/upload_photo/?stream_name=%s' % stream_name)
 
         input_values = {

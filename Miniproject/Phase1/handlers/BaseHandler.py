@@ -4,6 +4,7 @@ import jinja2
 import json
 import os
 from Stream import Stream
+from Stream import Photo
 from google.appengine.api import users
 
 class BaseHandler():

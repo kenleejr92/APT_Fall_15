@@ -3,6 +3,7 @@ __author__ = 'kenlee'
 import webapp2
 import datetime
 from Stream import Stream
+from Stream import Photo
 from google.appengine.api import users
 from google.appengine.ext import ndb
 

@@ -29,7 +29,7 @@
         {% for photo_obj in photo_objs %}
              <a href="{{ photo_obj.url }}" data-lightbox="stream">
                      <img src="{{ photo_obj.url }}" class="img-thumbnail stream_img"
-                          lat="{{ photo_obj.lat }}" lng="{{ photo_obj.long }}" date="{{ photo_obj.date }}"
+                          lat="{{ photo_obj.lat }}" lng="{{ photo_obj.lng }}" date="{{ photo_obj.date }}"
                              style="HEIGHT:300px;WIDTH:300px"/>
              </a>
         {% endfor %}

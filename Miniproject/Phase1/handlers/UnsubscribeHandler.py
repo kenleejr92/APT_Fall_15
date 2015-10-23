@@ -2,6 +2,7 @@ __author__ = 'kenlee'
 
 import webapp2
 from Stream import Stream
+from Stream import Photo
 from google.appengine.ext import ndb
 from google.appengine.api import users
 
