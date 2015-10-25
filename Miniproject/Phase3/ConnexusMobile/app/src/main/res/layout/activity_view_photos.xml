@@ -26,5 +26,11 @@
         android:gravity="center"
         />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/uploadImageActivity"
+        android:clickable="false"
+        android:id="@+id/open_image_upload_page"/>
 
 </LinearLayout>

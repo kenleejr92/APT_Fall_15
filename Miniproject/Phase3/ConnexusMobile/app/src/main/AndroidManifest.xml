@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -23,20 +24,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity2Activity"
-            android:label="@string/title_activity_main_activity2"
-            android:parentActivityName=".MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.kenlee.connexusmobile.MainActivity" />
-        </activity>
-        <activity
             android:name=".ViewStreams"
             android:label="@string/title_activity_view_streams" >
         </activity>
         <activity
             android:name=".ViewPhotos"
             android:label="@string/title_activity_view_photos" >
+        </activity>
+        <activity
+            android:name=".ImageUpload"
+            android:label="@string/title_activity_image_upload" >
         </activity>
     </application>
 

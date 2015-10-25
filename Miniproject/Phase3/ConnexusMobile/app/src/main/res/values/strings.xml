@@ -12,5 +12,9 @@
     <string name="title_activity_main_activity2">MainActivity2Activity</string>
     <string name="title_activity_view_streams">ViewStreams</string>
     <string name="title_activity_view_photos">ViewPhotos</string>
+    <string name="title_activity_image_upload">ImageUpload</string>
+    <string name="choose_from_library">Choose From Gallery</string>
+    <string name="upload_hint">Add a caption for photo</string>
+    <string name="uploadImage">Upload Image</string>
 
 </resources>

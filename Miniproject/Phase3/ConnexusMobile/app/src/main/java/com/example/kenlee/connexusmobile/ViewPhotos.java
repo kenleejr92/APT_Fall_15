@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -30,13 +31,14 @@ import java.util.ArrayList;
 public class ViewPhotos extends ActionBarActivity {
     Context context = this;
     private String TAG  = "Display Photos";
+    private String stream_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_photos);
         Intent intent = getIntent();
-        String stream_name = intent.getExtras().getString("stream_name");
+        stream_name = intent.getExtras().getString("stream_name");
         final String request_url = "http://apt15connexus.appspot.com/view_photos_mobile/?stream_name=" + stream_name;
 
         AsyncHttpClient httpClient = new AsyncHttpClient();
@@ -70,9 +72,7 @@ public class ViewPhotos extends ActionBarActivity {
                             imageDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                             imageDialog.setContentView(R.layout.thumbnail);
                             ImageView image = (ImageView) imageDialog.findViewById(R.id.thumbnail_IMAGEVIEW);
-
                             Picasso.with(context).load(imageURLs.get(position)).into(image);
-
                             imageDialog.show();
                         }
                     });
@@ -87,7 +87,20 @@ public class ViewPhotos extends ActionBarActivity {
                 Log.e(TAG, "There was a problem in retrieving the url : " + e.toString());
             }
         });
-    }
+
+        Button uploadButton = (Button) findViewById(R.id.open_image_upload_page);
+        uploadButton.setClickable(true);
+        uploadButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(context, ImageUpload.class);
+                        intent.putExtra("stream_name",stream_name);
+                        startActivity(intent);
+                    }
+                }
+        );
+}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
