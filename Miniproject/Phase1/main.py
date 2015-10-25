@@ -21,6 +21,7 @@ from handlers.UnsubscribeHandler import UnsubscribeHandler
 from handlers.ViewMapHandler import ViewMapHandler
 from handlers.ViewStreamsMobileHandler import ViewStreamsMobileHandler
 from handlers.ViewPhotosMobileHandler import ViewPhotosMobileHandler
+from handlers.PhotoUploadMobileHandler import PhotoUploadMobileHandler
 
 
 app = webapp2.WSGIApplication([('/', MainPageHandler),
@@ -40,5 +41,6 @@ app = webapp2.WSGIApplication([('/', MainPageHandler),
                                ('/unsubscribe_streams',UnsubscribeHandler),
                                ('/view_map/.*',ViewMapHandler),
                                ('/view_streams_mobile',ViewStreamsMobileHandler),
-                               ('/view_photos_mobile/.*',ViewPhotosMobileHandler)
+                               ('/view_photos_mobile/.*',ViewPhotosMobileHandler),
+                               ('/upload_photo_mobile.*', PhotoUploadMobileHandler)
                               ], debug=True)

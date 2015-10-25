@@ -19,9 +19,9 @@ class ViewPhotosMobileHandler(webapp2.RequestHandler):
         stream = stream_key.get()
 
         image_urls = {'image_urls': []}
-        photo_keys = stream.photos
-        for key in photo_keys:
-            image_urls['image_urls'].append(images.get_serving_url(key))
+        photos = stream.photos
+        for photo in photos:
+            image_urls['image_urls'].append(photo.url)
 
 
         image_json = json.dumps(image_urls,indent=4, separators=(',', ': '))
