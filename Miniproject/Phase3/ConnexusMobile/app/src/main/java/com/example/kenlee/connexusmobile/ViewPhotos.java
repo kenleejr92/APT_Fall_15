@@ -1,6 +1,7 @@
 package com.example.kenlee.connexusmobile;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -68,7 +69,7 @@ public class ViewPhotos extends ActionBarActivity {
                         System.out.println(image_urls.getString(i));
                     }
                     GridView gridview = (GridView) findViewById(R.id.gridview);
-                    gridview.setAdapter(new ImageAdapter(context, imageURLs, imageCaps));
+                    gridview.setAdapter(new KenAdapter(ViewPhotos.this, context, imageURLs, imageCaps));
                     gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View v,
@@ -90,27 +91,30 @@ public class ViewPhotos extends ActionBarActivity {
 //                Log.e("User", owner);
 //                Log.e("Front-end User", MainActivity.email);
 //                Log.e("IsEqual", String.valueOf(MainActivity.email.equals(owner)));
-                if (MainActivity.email.equals(owner)) {
-                    LinearLayout layout = (LinearLayout) findViewById(R.id.view_photo_layout);
-                    Button uploadButton = new Button(context);
-                    uploadButton.setText(R.string.uploadImage);
-                    uploadButton.setLayoutParams(new ActionBar.LayoutParams(
-                            ViewGroup.LayoutParams.WRAP_CONTENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT));
-                    layout.addView(uploadButton);
-                    uploadButton.setClickable(true);
-                    uploadButton.setOnClickListener(
-                            new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    Intent intent = new Intent(context, ImageUpload.class);
-                                    intent.putExtra("stream_name", stream_name);
-                                    startActivity(intent);
+                if(MainActivity.email!=null){
+                    if (MainActivity.email.equals(owner)) {
+                        LinearLayout layout = (LinearLayout) findViewById(R.id.view_photo_layout);
+                        Button uploadButton = new Button(context);
+                        uploadButton.setText(R.string.uploadImage);
+                        uploadButton.setLayoutParams(new ActionBar.LayoutParams(
+                                ViewGroup.LayoutParams.WRAP_CONTENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT));
+                        layout.addView(uploadButton);
+                        uploadButton.setClickable(true);
+                        uploadButton.setOnClickListener(
+                                new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent intent = new Intent(context, ImageUpload.class);
+                                        intent.putExtra("stream_name", stream_name);
+                                        startActivity(intent);
+                                    }
                                 }
-                            }
-                    );
-                    setContentView(layout);
+                        );
+                        setContentView(layout);
+                    }
                 }
+
 
             }
 

@@ -64,7 +64,7 @@ public class SearchActivity extends ActionBarActivity {
                         System.out.println(image_urls.getString(i));
                     }
                     GridView gridview = (GridView) findViewById(R.id.gridview);
-                    gridview.setAdapter(new ImageAdapter(context, imageURLs, imageCaps));
+                    gridview.setAdapter(new KenAdapter(SearchActivity.this, context, imageURLs, imageCaps));
                     gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View v,
