@@ -7,7 +7,10 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -34,6 +37,18 @@
         <activity
             android:name=".ImageUpload"
             android:label="@string/title_activity_image_upload" >
+        </activity>
+        <activity
+            android:name=".SearchActivity"
+            android:label="@string/title_activity_search" >
+        </activity>
+        <activity
+            android:name=".NearbyPhotos"
+            android:label="@string/title_activity_nearby_photos" >
+        </activity>
+        <activity
+            android:name=".SubscribedStreams"
+            android:label="@string/title_activity_subscribed_streams" >
         </activity>
     </application>
 

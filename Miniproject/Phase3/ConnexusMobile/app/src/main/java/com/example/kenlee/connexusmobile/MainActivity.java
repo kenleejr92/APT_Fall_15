@@ -41,6 +41,8 @@ public class MainActivity extends ActionBarActivity implements
 
     private Location mLastLocation;
 
+    private Person currentUser;
+
     // GoogleApiClient wraps our service connection to Google Play services and
     // provides access to the users sign in state and Google's APIs.
     private GoogleApiClient mGoogleApiClient;
@@ -243,7 +245,7 @@ public class MainActivity extends ActionBarActivity implements
         }
 
         // Retrieve some profile information to personalize our app for the user.
-        final Person currentUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+        currentUser = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
         email = Plus.AccountApi.getAccountName(mGoogleApiClient);
         System.out.println(email);
         // Indicate that the sign in process is complete.
@@ -357,8 +359,6 @@ public class MainActivity extends ActionBarActivity implements
         mRevokeButton.setEnabled(false);
 
         mStatus.setText("Signed out");
-        Button uploadButton = (Button) findViewById(R.id.open_image_upload_page);
-        uploadButton.setClickable(false);
 
         if (imageView != null) {
             ((ViewGroup) imageView.getParent()).removeView(imageView);

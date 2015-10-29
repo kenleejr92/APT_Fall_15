@@ -1,13 +1,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/view_streams_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.kenlee.connexusmobile.ViewStreams">
+    tools:context="com.example.kenlee.connexusmobile.SubscribedStreams">
 
     <TextView
-        android:text="@string/imagePage"
+        android:text="@string/subscribed_streams"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -26,31 +25,4 @@
         android:stretchMode="columnWidth"
         android:gravity="center"
         />
-
-
-
-    <EditText
-        android:id="@+id/search_text"
-        android:backgroundTint="@color/button_material_dark"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/search"/>
-
-    <Button
-        android:id="@+id/search_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/search"
-        android:onClick="searchResults"/>
-
-    <Button
-        android:id="@+id/nearby_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/nearby"
-        android:onClick="nearbyPhotos"
-        />
-
-
-
 </LinearLayout>

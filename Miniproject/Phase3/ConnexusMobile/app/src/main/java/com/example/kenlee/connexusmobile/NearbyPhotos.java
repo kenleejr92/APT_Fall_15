@@ -1,29 +1,22 @@
 package com.example.kenlee.connexusmobile;
 
-import android.app.ActionBar;
-import android.app.Dialog;
 import android.content.Context;
-
 import android.content.Intent;
-import android.os.Bundle;
+import android.location.Location;
 import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.squareup.picasso.Picasso;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -33,15 +26,43 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 
-public class ViewStreams extends ActionBarActivity {
+public class NearbyPhotos extends ActionBarActivity implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
     Context context = this;
-    private String TAG  = "Display Streams";
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+    private static final String TAG = "nearby photos";
+    private String latitude="kobe";
+    private String longitude="kobe";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_streams);
-        final String request_url = "http://apt15connexus.appspot.com/view_streams_mobile";
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        // Reaching onConnected means we consider the user signed in.
+        Log.i(TAG, "onConnected");
+
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        latitude=String.valueOf(mLastLocation.getLatitude());
+        longitude=String.valueOf(mLastLocation.getLongitude());
+        Log.e("latitude",latitude);
+        Log.e("longitude", longitude);
+        final String request_url = "http://apt15connexus.appspot.com/nearby_photos/?latitude="+latitude+"&longitude="+longitude;
         AsyncHttpClient httpClient = new AsyncHttpClient();
         httpClient.get(request_url, new AsyncHttpResponseHandler() {
             @Override
@@ -54,7 +75,7 @@ public class ViewStreams extends ActionBarActivity {
                     JSONArray image_urls = jObject.getJSONArray("image_urls");
                     //JSONArray displayCaption = jObject.getJSONArray("imageCaptionList");
 
-                    for (int i = 0; i < stream_names.length(); i++) {
+                    for (int i = 0; i < image_urls.length(); i++) {
 
                         imageURLs.add(image_urls.getString(i));
                         imageCaps.add(stream_names.getString(i));
@@ -85,32 +106,39 @@ public class ViewStreams extends ActionBarActivity {
             }
         });
 
-        if(MainActivity.email!=null) {
-            LinearLayout layout = (LinearLayout) findViewById(R.id.view_streams_layout);
-            Button mySubscribed = new Button(this);
-            mySubscribed.setText(R.string.subscribed_streams);
-            mySubscribed.setLayoutParams(new ActionBar.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT));
-            layout.addView(mySubscribed);
-            mySubscribed.setClickable(true);
-            mySubscribed.setOnClickListener(
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(context, SubscribedStreams.class);
-                            startActivity(intent);
-                        }
-                    }
-            );
-            setContentView(layout);
-        }
+    }
+
+    /* onConnectionFailed is called when our Activity could not connect to Google
+     * Play services.  onConnectionFailed indicates that the user needs to select
+     * an account, grant permissions or resolve an error in order to sign in.
+     */
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        // Refer to the javadoc for ConnectionResult to see what error codes might
+        // be returned in onConnectionFailed.
+        Log.i(TAG, "onConnectionFailed: ConnectionResult.getErrorCode() = "
+                + result.getErrorCode());
+    }
+    @Override
+    public void onConnectionSuspended(int cause) {
+        // The connection to Google Play services was lost for some reason.
+        // We call connect() to attempt to re-establish the connection or get a
+        // ConnectionResult that we can attempt to resolve.
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_nearby_photos);
+        mGoogleApiClient = buildGoogleApiClient();
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_view_streams, menu);
+        getMenuInflater().inflate(R.menu.menu_nearby_photos, menu);
         return true;
     }
 
@@ -129,17 +157,14 @@ public class ViewStreams extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void searchResults(View view){
-        EditText searchbox = (EditText) findViewById(R.id.search_text);
-        String query_string = searchbox.getText().toString();
-        Intent intent = new Intent(this, SearchActivity.class);
-        intent.putExtra("query_string",query_string);
-        startActivity(intent);
+    private GoogleApiClient buildGoogleApiClient() {
+        // When we build the GoogleApiClient we specify where connected and
+        // connection failed callbacks should be returned, which Google APIs our
+        // app uses and which OAuth 2.0 scopes our app requests.
+        return new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
     }
-
-    public void nearbyPhotos(View view){
-        Intent intent = new Intent(this, NearbyPhotos.class);
-        startActivity(intent);
-    }
-
 }

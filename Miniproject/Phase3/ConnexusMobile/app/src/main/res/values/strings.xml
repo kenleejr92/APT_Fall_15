@@ -16,5 +16,13 @@
     <string name="choose_from_library">Choose From Gallery</string>
     <string name="upload_hint">Add a caption for photo</string>
     <string name="uploadImage">Upload Image</string>
+    <string name="search">Search</string>
+    <string name="nearby">Nearby Photos</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="search_results">Search Results</string>
+    <string name="title_activity_nearby_photos">NearbyPhotos</string>
+    <string name="title_activity_subscribed_streams">SubscribedStreams</string>
+    <string name="subscribed_streams">My Subscribed Streams</string>
+    <string name="take_picture">Take Picture</string>
 
 </resources>

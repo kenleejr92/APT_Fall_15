@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -38,6 +39,9 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class ImageUpload extends ActionBarActivity implements
@@ -48,6 +52,10 @@ public class ImageUpload extends ActionBarActivity implements
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private static final String TAG = "location testing";
+    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+    private static final int CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE = 200;
+    private Uri fileUri;
+    Bitmap bitmapImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +63,9 @@ public class ImageUpload extends ActionBarActivity implements
         setContentView(R.layout.activity_image_upload);
         Intent intent = getIntent();
         stream_name = intent.getExtras().getString("stream_name");
+
+
+
 
         // Choose image from library
         Button chooseFromLibraryButton = (Button) findViewById(R.id.choose_from_library);
@@ -161,35 +172,62 @@ public class ImageUpload extends ActionBarActivity implements
             // Bitmap imaged created and show thumbnail
 
             ImageView imgView = (ImageView) findViewById(R.id.thumbnail);
-            final Bitmap bitmapImage = BitmapFactory.decodeFile(imageFilePath);
+            bitmapImage = BitmapFactory.decodeFile(imageFilePath);
             imgView.setImageBitmap(bitmapImage);
 
             // Enable the upload button once image has been uploaded
 
-            Button uploadButton = (Button) findViewById(R.id.upload_to_server);
-            uploadButton.setClickable(true);
 
-            uploadButton.setOnClickListener(
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
 
-                            // Get photo caption
 
-                            EditText text = (EditText) findViewById(R.id.upload_message);
-                            String photoCaption = text.getText().toString();
-
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 50, baos);
-                            byte[] b = baos.toByteArray();
-                            byte[] encodedImage = Base64.encode(b, Base64.DEFAULT);
-                            String encodedImageStr = encodedImage.toString();
-
-                            getUploadURL(b, photoCaption);
-                        }
-                    }
-            );
         }
+        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                // Image captured and saved to fileUri specified in the Intent
+                Toast.makeText(this, "Image Uploaded", Toast.LENGTH_LONG).show();
+                Log.e("File URI",fileUri.getPath());
+                String imageFilePath = fileUri.getPath();
+                bitmapImage = BitmapFactory.decodeFile(imageFilePath);
+            } else if (resultCode == RESULT_CANCELED) {
+                // User cancelled the image capture
+            } else {
+                // Image capture failed, advise user
+            }
+        }
+
+        if (requestCode == CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                // Video captured and saved to fileUri specified in the Intent
+                Toast.makeText(this, "Video saved to:\n" +
+                        data.getData(), Toast.LENGTH_LONG).show();
+            } else if (resultCode == RESULT_CANCELED) {
+                // User cancelled the video capture
+            } else {
+                // Video capture failed, advise user
+            }
+        }
+        Button uploadButton = (Button) findViewById(R.id.upload_to_server);
+        uploadButton.setClickable(true);
+        uploadButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        // Get photo caption
+
+                        EditText text = (EditText) findViewById(R.id.upload_message);
+                        String photoCaption = text.getText().toString();
+
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        bitmapImage.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+                        byte[] b = baos.toByteArray();
+                        byte[] encodedImage = Base64.encode(b, Base64.DEFAULT);
+                        String encodedImageStr = encodedImage.toString();
+
+                        getUploadURL(b, photoCaption);
+                    }
+                }
+        );
     }
 
     private void getUploadURL(final byte[] encodedImage, final String photoCaption){
@@ -261,4 +299,58 @@ public class ImageUpload extends ActionBarActivity implements
                 .addApi(LocationServices.API)
                 .build();
     }
+
+    public static final int MEDIA_TYPE_IMAGE = 1;
+    public static final int MEDIA_TYPE_VIDEO = 2;
+
+    /** Create a file Uri for saving an image or video */
+    private static Uri getOutputMediaFileUri(int type){
+        return Uri.fromFile(getOutputMediaFile(type));
+    }
+
+    /** Create a File for saving an image or video */
+    private static File getOutputMediaFile(int type){
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "MyCameraApp");
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (! mediaStorageDir.exists()){
+            if (! mediaStorageDir.mkdirs()){
+                Log.d("MyCameraApp", "failed to create directory");
+                return null;
+            }
+        }
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile;
+        if (type == MEDIA_TYPE_IMAGE){
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "IMG_"+ timeStamp + ".jpg");
+        } else if(type == MEDIA_TYPE_VIDEO) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "VID_"+ timeStamp + ".mp4");
+        } else {
+            return null;
+        }
+
+        return mediaFile;
+    }
+
+    public void takePicture(View view){
+        // create Intent to take a picture and return control to the calling application
+        Intent intent2 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // create a file to save the image
+        intent2.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
+
+        // start the image capture Intent
+        startActivityForResult(intent2, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+    }
+
+
 }
