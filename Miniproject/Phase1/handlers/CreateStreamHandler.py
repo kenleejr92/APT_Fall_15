@@ -64,7 +64,8 @@ class CreateStreamHandler(webapp2.RequestHandler, BaseHandler):
             #Add stream to the datastore
             user = users.get_current_user()
             new_stream = Stream(owner_id = user.user_id(),name=stream_name,photos=[], num_photos = 0, views=0,  view_queue=[],
-                                subscribed_users=subscriber_ids,timestamp = datetime.datetime.now(), tags = tags, cover_image=cover_image)
+                                subscribed_users=subscriber_ids,timestamp = datetime.datetime.now(), tags = tags, cover_image=cover_image,
+                                email=user.email())
             new_stream.key = ndb.Key(Stream, stream_name)
             new_stream.put()
 

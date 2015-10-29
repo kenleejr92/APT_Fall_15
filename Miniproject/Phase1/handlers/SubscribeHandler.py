@@ -16,7 +16,7 @@ class SubscribeHandler(webapp2.RequestHandler):
         stream_name = str.split()[2]
         stream_key = ndb.Key(Stream,stream_name)
         stream = stream_key.get()
-        stream.subscribed_users.append(user.user_id())
+        stream.subscribed_users.append(user.email())
         stream.put()
 
         self.redirect('/view_stream/?stream_name=%s' % stream_name)

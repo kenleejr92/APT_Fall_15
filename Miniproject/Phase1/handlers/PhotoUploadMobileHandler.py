@@ -33,8 +33,8 @@ class PhotoUploadMobileHandler(blobstore_handlers.BlobstoreUploadHandler):
             blob_key = upload.key()
             stream_key = ndb.Key(Stream,stream_name)
             stream = stream_key.get()
-            # rand_date=random_date(datetime.date(2015,12,1),datetime.date(2015,12,25))
-            new_photo = Photo(url=images.get_serving_url(blob_key), lat=latitude, lng=longitude, date=current_date)
+            rand_date=random_date(datetime.date(2015,12,1),datetime.date(2015,12,25))
+            new_photo = Photo(url=images.get_serving_url(blob_key), lat=float(latitude), lng=float(longitude), date=rand_date)
             stream.photos.append(new_photo)
             stream.num_photos += 1
             stream.date_last_added = datetime.date.today()

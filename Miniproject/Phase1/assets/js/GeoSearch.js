@@ -54,8 +54,8 @@ $(document).ready(function() {
 			var lngSpan = northEast.lng() - southWest.lng();
 			var latSpan = northEast.lat() - southWest.lat();
 			for(var i=0; i<photo_objs.length; i++) {
-				var lat = southWest.lat() + latSpan * Math.random();
-				var lng = southWest.lng() + lngSpan * Math.random();
+				var lat = photo_objs[i].lat
+				var lng = photo_objs[i].lng
 				var point = new google.maps.LatLng(lat,lng);
 				var marker = new google.maps.Marker({map:map, position:point, clickable:true, date:photo_objs[i].date});
 				var infowindow = new google.maps.InfoWindow();

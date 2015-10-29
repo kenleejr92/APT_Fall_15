@@ -22,6 +22,9 @@ from handlers.ViewMapHandler import ViewMapHandler
 from handlers.ViewStreamsMobileHandler import ViewStreamsMobileHandler
 from handlers.ViewPhotosMobileHandler import ViewPhotosMobileHandler
 from handlers.PhotoUploadMobileHandler import PhotoUploadMobileHandler
+from handlers.SearchStreamMobileHandler import SearchStreamMobileHandler
+from handlers.NearbyPhotoHandler import NearbyPhotoHandler
+from handlers.SubscribedMobileHandler import SubscribedMobileHandler
 
 
 app = webapp2.WSGIApplication([('/', MainPageHandler),
@@ -42,5 +45,8 @@ app = webapp2.WSGIApplication([('/', MainPageHandler),
                                ('/view_map/.*',ViewMapHandler),
                                ('/view_streams_mobile',ViewStreamsMobileHandler),
                                ('/view_photos_mobile/.*',ViewPhotosMobileHandler),
-                               ('/upload_photo_mobile.*', PhotoUploadMobileHandler)
+                               ('/upload_photo_mobile.*', PhotoUploadMobileHandler),
+                               ('/search_streams_mobile/.*', SearchStreamMobileHandler),
+                               ('/nearby_photos/.*', NearbyPhotoHandler),
+                               ('/subscribed_streams_mobile/.*',SubscribedMobileHandler)
                               ], debug=True)

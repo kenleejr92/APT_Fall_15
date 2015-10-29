@@ -24,4 +24,5 @@ class Stream(ndb.Model):
 
     tags = ndb.StringProperty(repeated=True)    #list of tags
     cover_image = ndb.StringProperty()      #url to cover image
+    email = ndb.StringProperty()
 

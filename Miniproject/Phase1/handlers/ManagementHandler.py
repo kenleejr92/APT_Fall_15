@@ -19,10 +19,11 @@ class ManagementHandler(webapp2.RequestHandler, BaseHandler):
 
         user = users.get_current_user()
         user_id = user.user_id()
+        user_email = user.email()
 
         #Get the list of streams
         my_streams = Stream.query(Stream.owner_id == user_id)
-        subscribed_streams = Stream.query(Stream.subscribed_users.IN([user_id]))
+        subscribed_streams = Stream.query(Stream.subscribed_users.IN([user_email]))
         template_values = {
             'my_streams':my_streams,
             'subscribed_streams':subscribed_streams
