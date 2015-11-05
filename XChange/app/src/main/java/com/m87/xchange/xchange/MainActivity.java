@@ -1,6 +1,7 @@
 package com.m87.xchange.xchange;
 
 import android.app.Activity;
+import android.content.Context;
 import android.inputmethodservice.KeyboardView;
 import android.os.Bundle;
 import android.text.Editable;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.m87.sdk.M87Action;
 import com.m87.sdk.M87Callbacks;
@@ -20,8 +22,12 @@ import com.m87.sdk.M87NearEntryState;
 import com.m87.sdk.M87NearMsgEntry;
 import com.m87.sdk.M87StatusCode;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 public class MainActivity extends Activity {
@@ -30,7 +36,11 @@ public class MainActivity extends Activity {
     public Button sb;
     public TextView tv;
     public String message;
+    public static int myID = 7;
+    //public static int myID = 17;
 
+    public Set<Integer> nearbyIDs;
+    Context context;
 
     private class XChangeCallbacks implements M87Callbacks
     {
@@ -40,7 +50,8 @@ public class MainActivity extends Activity {
             if (a == M87Action.INIT)
             {
                 mApi.nearSubscribe(0, null, null);
-                mApi.nearPublish(0, null, 0, 17);
+                mApi.nearPublish(0, null, 0, myID);
+                nearbyIDs = new HashSet<>();
 
             }
         }
@@ -86,13 +97,13 @@ public class MainActivity extends Activity {
 
             for (M87NearEntry n : neighbors)
             {
-
+                nearbyIDs.add(n.id());
             }
         }
 
         public void onNearMsgEntry(M87NearMsgEntry obj, M87NearEntryState state)
         {
-            if (obj == null || obj.srcId() == obj.dstId())
+            if (obj == null || obj.srcId() == myID)
             {
                 return;
             }
@@ -143,6 +154,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         mApi = new M87Api(this, new XChangeCallbacks());
         mApi.initialize(this);
+        context = this;
 
         e1 = (EditText)findViewById(R.id.text_id);
         sb = (Button)findViewById(R.id.send_id);
@@ -150,10 +162,20 @@ public class MainActivity extends Activity {
         sb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("KHL","Message Sent");
+                Log.d("KHL", "Message Sent");
+
+
                 message = e1.getText().toString();
-                mApi.nearMsgSend(7,message);
-                //mApi.nearMsgBroadcast(message);
+                if(!nearbyIDs.isEmpty()) {
+                    for (Integer id : nearbyIDs) {
+                        mApi.nearMsgSend(id, message);
+                    }
+                }
+
+                CharSequence text = "Message Sent";
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
             }
         });
 
