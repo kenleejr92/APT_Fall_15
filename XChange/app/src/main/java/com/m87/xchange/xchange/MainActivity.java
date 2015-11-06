@@ -1,18 +1,12 @@
 package com.m87.xchange.xchange;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Context;
-import android.inputmethodservice.KeyboardView;
 import android.os.Bundle;
-import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.m87.sdk.M87Action;
 import com.m87.sdk.M87Callbacks;
@@ -23,23 +17,19 @@ import com.m87.sdk.M87NearMsgEntry;
 import com.m87.sdk.M87StatusCode;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 
-public class MainActivity extends Activity {
-    public M87Api mApi;
-    public EditText e1;
-    public Button sb;
-    public TextView tv;
-    public String message;
+public class MainActivity extends Activity implements HomeScreenFragment.HomeScreenListener,
+        PendingRequestsFragment.PendingRequestsListener, NearbyFragment.NearbyListener {
+    public static M87Api mApi;
     public static int myID = 7;
     //public static int myID = 17;
 
-    public Set<Integer> nearbyIDs;
+    public static Set<Integer> nearbyIDs;
+    public static List<M87NearMsgEntry> msgList;
     Context context;
 
     private class XChangeCallbacks implements M87Callbacks
@@ -52,6 +42,7 @@ public class MainActivity extends Activity {
                 mApi.nearSubscribe(0, null, null);
                 mApi.nearPublish(0, null, 0, myID);
                 nearbyIDs = new HashSet<>();
+                msgList = new ArrayList<>();
 
             }
         }
@@ -115,8 +106,8 @@ public class MainActivity extends Activity {
                 case SDK_NEAR_ENTRY_UPDATE: op = "Updating"; break;
                 case SDK_NEAR_ENTRY_DELETE: op = "Deleting"; break;
             }
-            Log.d("KHL","obj.dstID: " + obj.dstId() + "obj.srcID:" + obj.srcId() + "obj.msg:" + obj.msg());
-            tv.setText("obj.dstID: " + obj.dstId() + "obj.srcID:" + obj.srcId() + "obj.msg:" + obj.msg());
+            Log.d("KHL", "obj.dstID: " + obj.dstId() + "obj.srcID:" + obj.srcId() + "obj.msg:" + obj.msg());
+            msgList.add(obj);
         }
 
         public void onNearMsgTable(M87NearMsgEntry[] msgs)
@@ -149,37 +140,34 @@ public class MainActivity extends Activity {
     };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mApi = new M87Api(this, new XChangeCallbacks());
         mApi.initialize(this);
-        context = this;
 
-        e1 = (EditText)findViewById(R.id.text_id);
-        sb = (Button)findViewById(R.id.send_id);
-        tv = (TextView)findViewById(R.id.response_id);
-        sb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d("KHL", "Message Sent");
+        // Check that the activity is using the layout version with
+        // the fragment_container FrameLayout
+        if (findViewById(R.id.fragment_container) != null) {
 
-
-                message = e1.getText().toString();
-                if(!nearbyIDs.isEmpty()) {
-                    for (Integer id : nearbyIDs) {
-                        mApi.nearMsgSend(id, message);
-                    }
-                }
-
-                CharSequence text = "Message Sent";
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
+            // However, if we're being restored from a previous state,
+            // then we don't need to do anything and should return or else
+            // we could end up with overlapping fragments.
+            if (savedInstanceState != null) {
+                return;
             }
-        });
 
+            // Create a new Fragment to be placed in the activity layout
+            HomeScreenFragment firstFragment = new HomeScreenFragment();
 
+            // In case this activity was started with special instructions from an
+            // Intent, pass the Intent's extras to the fragment as arguments
+            firstFragment.setArguments(getIntent().getExtras());
+
+            // Add the fragment to the 'fragment_container' FrameLayout
+            getFragmentManager().beginTransaction()
+                    .add(R.id.fragment_container, firstFragment).commit();
+        }
     }
 
     @Override
@@ -209,5 +197,50 @@ public class MainActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    @Override
+    public void onNearbyPressed(){
+        // Create fragment and give it an argument specifying the article it should show
+        NearbyFragment newFragment = new NearbyFragment();
+
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack so the user can navigate back
+        transaction.replace(R.id.fragment_container, newFragment);
+        transaction.addToBackStack(null);
+
+        // Commit the transaction
+        transaction.commit();
+
+    }
+
+    @Override
+    public void onPendingPressed(){
+        // Create fragment and give it an argument specifying the article it should show
+        PendingRequestsFragment newFragment = new PendingRequestsFragment();
+
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack so the user can navigate back
+        transaction.replace(R.id.fragment_container, newFragment);
+        transaction.addToBackStack(null);
+
+        // Commit the transaction
+        transaction.commit();
+    }
+
+    @Override
+    public void onAddContact(){
+
+    }
+
+    @Override
+    public void onSendContacts(){
+
+    }
+
 }
 
