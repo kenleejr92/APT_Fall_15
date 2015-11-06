@@ -8,4 +8,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="nearby">Nearby</string>
     <string name="pending">Pending</string>
+    <string name="signin_prompt">What is Your Name?</string>
+    <string name="submit_signin">Submit</string>
 </resources>

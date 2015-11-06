@@ -3,6 +3,7 @@ package com.m87.xchange.xchange;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -23,7 +24,7 @@ import java.util.Set;
 
 
 public class MainActivity extends Activity implements HomeScreenFragment.HomeScreenListener,
-        PendingRequestsFragment.PendingRequestsListener, NearbyFragment.NearbyListener {
+        PendingRequestsFragment.PendingRequestsListener, NearbyFragment.NearbyListener, SigninFragent.SigninListener{
     public static M87Api mApi;
     public static int myID = 7;
     //public static int myID = 17;
@@ -31,6 +32,7 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
     public static Set<Integer> nearbyIDs;
     public static List<M87NearMsgEntry> msgList;
     Context context;
+    public String username;
 
     private class XChangeCallbacks implements M87Callbacks
     {
@@ -157,16 +159,26 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
                 return;
             }
 
-            // Create a new Fragment to be placed in the activity layout
-            HomeScreenFragment firstFragment = new HomeScreenFragment();
+            // Restore preferences
+            SharedPreferences settings = getPreferences(MODE_PRIVATE);
+            username = settings.getString("Username","false");
+            if(username.equals("false")){
+                //No username specified, render signin fragment
+                SigninFragent signin = new SigninFragent();
+                signin.setArguments(getIntent().getExtras());
+                getFragmentManager().beginTransaction().add(R.id.fragment_container,signin).commit();
+            } else {
+                // Create a new Fragment to be placed in the activity layout
+                HomeScreenFragment firstFragment = new HomeScreenFragment();
 
-            // In case this activity was started with special instructions from an
-            // Intent, pass the Intent's extras to the fragment as arguments
-            firstFragment.setArguments(getIntent().getExtras());
+                // In case this activity was started with special instructions from an
+                // Intent, pass the Intent's extras to the fragment as arguments
+                firstFragment.setArguments(getIntent().getExtras());
 
-            // Add the fragment to the 'fragment_container' FrameLayout
-            getFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, firstFragment).commit();
+                // Add the fragment to the 'fragment_container' FrameLayout
+                getFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, firstFragment).commit();
+            }
         }
     }
 
@@ -196,6 +208,25 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSignedIn(String username){
+        //Store the username
+        SharedPreferences settings = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("Username", username);
+        editor.commit();
+
+        // Create a new Fragment to be placed in the activity layout
+        HomeScreenFragment newFragment = new HomeScreenFragment();
+
+        // In case this activity was started with special instructions from an
+        // Intent, pass the Intent's extras to the fragment as arguments
+        newFragment.setArguments(getIntent().getExtras());
+
+        // Add the fragment to the 'fragment_container' FrameLayout
+        getFragmentManager().beginTransaction().replace(R.id.fragment_container, newFragment).commit();
     }
 
 
