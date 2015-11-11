@@ -21,3 +21,9 @@ def largest(list):
   print "Hello"
   print "Hello"
 
+class Hello:
+    def whatup:
+	print "Hello"
+        print "Hello"
+        print "Hello"
+
