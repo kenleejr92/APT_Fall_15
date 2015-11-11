@@ -22,7 +22,7 @@ def largest(list):
   print "Hello"
 
 class Hello:
-    def whatup:
+    def whatup(self):
 	print "Hello"
         print "Hello"
         print "Hello"
