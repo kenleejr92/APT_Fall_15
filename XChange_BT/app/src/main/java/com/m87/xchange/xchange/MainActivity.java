@@ -26,17 +26,13 @@ import java.util.Set;
 public class MainActivity extends Activity implements HomeScreenFragment.HomeScreenListener,
         PendingRequestsFragment.PendingRequestsListener, NearbyFragment.NearbyListener, SigninFragent.SigninListener{
 
-    private HomeScreenFragment mHomeScreenFragment;
-    private NearbyFragment mNearbyFragment;
-    private PendingRequestsFragment mPendingRequestsFragment;
-    private SigninFragent mSigninFragment;
-    private SharedPreferences settings;
-    private SharedPreferences.Editor editor;
-
     public static M87Api mApi;
-    //public static int myID = 7;
-    public static int myID = 17;
+    public static int myID = 7;
+    //public static int myID = 17;
 
+    public static Set<Integer> nearbyIDs;
+    public static List<M87NearMsgEntry> msgList;
+    Context context;
     public String username;
 
     private class XChangeCallbacks implements M87Callbacks
@@ -48,6 +44,9 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
             {
                 mApi.nearSubscribe(0, null, null);
                 mApi.nearPublish(0, null, 0, myID);
+                nearbyIDs = new HashSet<>();
+                msgList = new ArrayList<>();
+
             }
         }
 
@@ -79,15 +78,10 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
         public void onNearTable(M87NearEntry[] neighbors)
         {
 
-            mNearbyFragment.neighborList.clear();
             for (M87NearEntry n : neighbors)
             {
-                mNearbyFragment.neighborList.add(n);
+                nearbyIDs.add(n.id());
             }
-            if(mNearbyFragment!=null){
-                mNearbyFragment.display();
-            }
-
         }
 
         public void onNearMsgEntry(M87NearMsgEntry obj, M87NearEntryState state)
@@ -105,6 +99,7 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
                 case SDK_NEAR_ENTRY_DELETE: op = "Deleting"; break;
             }
             Log.d("KHL", "obj.dstID: " + obj.dstId() + "obj.srcID:" + obj.srcId() + "obj.msg:" + obj.msg());
+            msgList.add(obj);
         }
 
         public void onNearMsgTable(M87NearMsgEntry[] msgs)
@@ -155,18 +150,24 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
             }
 
             // Restore preferences
-            settings = getPreferences(MODE_PRIVATE);
+            SharedPreferences settings = getPreferences(MODE_PRIVATE);
             username = settings.getString("Username","false");
             if(username.equals("false")){
                 //No username specified, render signin fragment
-                mSigninFragment = new SigninFragent();
-                mSigninFragment.setArguments(getIntent().getExtras());
-                getFragmentManager().beginTransaction().add(R.id.fragment_container,mSigninFragment).commit();
+                SigninFragent signin = new SigninFragent();
+                signin.setArguments(getIntent().getExtras());
+                getFragmentManager().beginTransaction().add(R.id.fragment_container,signin).commit();
             } else {
-                mHomeScreenFragment = new HomeScreenFragment();
-                mHomeScreenFragment.setArguments(getIntent().getExtras());
+                // Create a new Fragment to be placed in the activity layout
+                HomeScreenFragment firstFragment = new HomeScreenFragment();
+
+                // In case this activity was started with special instructions from an
+                // Intent, pass the Intent's extras to the fragment as arguments
+                firstFragment.setArguments(getIntent().getExtras());
+
+                // Add the fragment to the 'fragment_container' FrameLayout
                 getFragmentManager().beginTransaction()
-                        .add(R.id.fragment_container, mHomeScreenFragment).commit();
+                        .add(R.id.fragment_container, firstFragment).commit();
             }
         }
     }
@@ -175,17 +176,6 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
     protected void onResume() {
         super.onResume();
 
-    }
-    @Override
-    protected void onPause(){
-        super.onPause();
-        /****************************For Testing************************/
-        settings = getPreferences(MODE_PRIVATE);
-        editor = settings.edit();
-        editor.clear();
-        editor.commit();
-        Log.d("KHL","Deleted username");
-        /**************************************************************/
     }
 
     @Override
@@ -213,33 +203,33 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
     @Override
     public void onSignedIn(String username){
         //Store the username
-        settings = getPreferences(MODE_PRIVATE);
-        editor = settings.edit();
+        SharedPreferences settings = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
         editor.putString("Username", username);
         editor.commit();
 
         // Create a new Fragment to be placed in the activity layout
-        mHomeScreenFragment = new HomeScreenFragment();
+        HomeScreenFragment newFragment = new HomeScreenFragment();
 
         // In case this activity was started with special instructions from an
         // Intent, pass the Intent's extras to the fragment as arguments
-        mHomeScreenFragment.setArguments(getIntent().getExtras());
+        newFragment.setArguments(getIntent().getExtras());
 
         // Add the fragment to the 'fragment_container' FrameLayout
-        getFragmentManager().beginTransaction().replace(R.id.fragment_container, mHomeScreenFragment).commit();
+        getFragmentManager().beginTransaction().replace(R.id.fragment_container, newFragment).commit();
     }
 
 
     @Override
     public void onNearbyPressed(){
         // Create fragment and give it an argument specifying the article it should show
-        mNearbyFragment = new NearbyFragment();
+        NearbyFragment newFragment = new NearbyFragment();
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
         // Replace whatever is in the fragment_container view with this fragment,
         // and add the transaction to the back stack so the user can navigate back
-        transaction.replace(R.id.fragment_container, mNearbyFragment);
+        transaction.replace(R.id.fragment_container, newFragment);
         transaction.addToBackStack(null);
 
         // Commit the transaction
@@ -250,13 +240,13 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
     @Override
     public void onPendingPressed(){
         // Create fragment and give it an argument specifying the article it should show
-        mPendingRequestsFragment = new PendingRequestsFragment();
+        PendingRequestsFragment newFragment = new PendingRequestsFragment();
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
         // Replace whatever is in the fragment_container view with this fragment,
         // and add the transaction to the back stack so the user can navigate back
-        transaction.replace(R.id.fragment_container, mPendingRequestsFragment);
+        transaction.replace(R.id.fragment_container, newFragment);
         transaction.addToBackStack(null);
 
         // Commit the transaction

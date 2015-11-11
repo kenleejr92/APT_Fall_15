@@ -1,27 +1,17 @@
 package com.m87.xchange.xchange;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
-
-import com.m87.sdk.M87NearEntry;
-
-import java.util.ArrayList;
 
 
 public class PendingRequestsFragment extends Fragment {
 
     private PendingRequestsListener mListener;
-
 
     public static PendingRequestsFragment newInstance(String param1, String param2) {
         PendingRequestsFragment fragment = new PendingRequestsFragment();
@@ -66,7 +56,5 @@ public class PendingRequestsFragment extends Fragment {
     public interface PendingRequestsListener {
         public void onAddContact();
     }
-
-
 
 }

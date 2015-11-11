@@ -2,33 +2,42 @@ package com.m87.xchange.xchange;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.m87.sdk.M87Action;
+import com.m87.sdk.M87Callbacks;
+import com.m87.sdk.M87Event;
 import com.m87.sdk.M87NearEntry;
+import com.m87.sdk.M87NearEntryState;
+import com.m87.sdk.M87NearMsgEntry;
+import com.m87.sdk.M87StatusCode;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 
-public class PendingRequestsFragment extends Fragment {
+public class NearbyFragment extends Fragment {
+    private NearbyListener mListener;
 
-    private PendingRequestsListener mListener;
-
-
-    public static PendingRequestsFragment newInstance(String param1, String param2) {
-        PendingRequestsFragment fragment = new PendingRequestsFragment();
+    public static NearbyFragment newInstance(String param1, String param2) {
+        NearbyFragment fragment = new NearbyFragment();
         return fragment;
     }
 
-    public PendingRequestsFragment() {
+    public NearbyFragment() {
         // Required empty public constructor
     }
 
@@ -36,10 +45,10 @@ public class PendingRequestsFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (PendingRequestsListener) activity;
+            mListener = (NearbyListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement FragmentListener");
         }
     }
 
@@ -51,22 +60,23 @@ public class PendingRequestsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        ViewGroup mRootView = (ViewGroup) inflater.inflate(R.layout.fragment_nearby, null);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_pending_requests, container, false);
+        return mRootView;
     }
 
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            mListener.onAddContact();
+            mListener.onSendContacts();
         }
     }
 
 
     //Implemented by Main Activity
-    public interface PendingRequestsListener {
-        public void onAddContact();
+    public interface NearbyListener {
+        public void onSendContacts();
     }
 
-
-
 }
+
+

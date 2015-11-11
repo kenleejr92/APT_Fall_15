@@ -10,6 +10,4 @@
     <string name="pending">Pending</string>
     <string name="signin_prompt">What is Your Name?</string>
     <string name="submit_signin">Submit</string>
-    <string name="table_title">Nearby Devices</string>
-    <string name="send_button">Send Contacts</string>
 </resources>
