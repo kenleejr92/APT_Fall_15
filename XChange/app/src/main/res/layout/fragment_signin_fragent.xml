@@ -3,26 +3,47 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/teal"
+    android:orientation="vertical"
     tools:context="com.m87.xchange.xchange.SigninFragent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/title"
+        android:textSize="38sp"
+        android:id="@+id/title"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="76dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:id="@+id/prompt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/signin_prompt"
-        android:layout_centerInParent="true"/>
+        android:textSize="28sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/title"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="116dp" />
 
     <EditText
         android:id="@+id/signin_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="250dp"
+        android:layout_height="36dp"
+        android:background="@color/white"
+        android:layout_below="@+id/prompt"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:id="@+id/submit_signin"
         android:text="@string/submit_signin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/signin_text"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/signin_text"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
