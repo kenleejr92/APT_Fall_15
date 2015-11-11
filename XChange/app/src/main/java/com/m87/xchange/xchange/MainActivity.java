@@ -34,8 +34,8 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
     private SharedPreferences.Editor editor;
 
     public static M87Api mApi;
-    //public static int myID = 7;
-    public static int myID = 17;
+    public static int myID = 7;
+    //public static int myID = 17;
 
     public String username;
 
@@ -74,6 +74,10 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
                 case SDK_NEAR_ENTRY_UPDATE: op = "Updating"; break;
                 case SDK_NEAR_ENTRY_DELETE: op = "Deleting"; break;
             }
+
+            //send messsage Who? back to them
+            //they send back name,
+            //store in hash table and notify mNearbyFragment
         }
 
         public void onNearTable(M87NearEntry[] neighbors)
