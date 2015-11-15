@@ -4,31 +4,42 @@ import java.util.*;
 
 public class Process {
 	public static Integer myID;
+	public static String processType;
 	public static Integer numProcesses;
 	public static ProcessInfo[] processes;
 	public static List<Channel> channelList;
-	public static Integer f = 1;
+	public static Random rand;
+	public static Integer f;
 	
 	public static void main(String[] args) throws Exception {
-		if(args.length > 1 || args.length == 0){
+		if(args.length != 2){
 			System.out.println("Incorrect Arguments");
 			System.exit(0);
 		}else{
-			myID = Integer.parseInt(args[0]);
+			processType = args[0];
+			myID = Integer.parseInt(args[1]);
 		}
 		try{
 			ConnectAllServers();
+			Thread.sleep(5000);
 			for(Channel c:channelList){
 				if(c!=null){
-					System.out.println("Connected to: " + String.valueOf(c.getRemoteID()));
+					//System.out.println("Connected to: " + String.valueOf(c.getRemoteID()));
 				}
 			}
-			BufferedReader dIn = new BufferedReader(new InputStreamReader(System.in));
-			String proposal_string = dIn.readLine();
-			Integer proposal= Integer.parseInt(proposal_string);
-			ByzantineAgreement ba = new ByzantineAgreement(proposal,f);
-			Integer agreement = ba.run();
-			System.out.println("I agree on "+ agreement);
+			if(processType.equals("-n")){
+				Integer proposal = rand0or1();
+				System.out.println("nP" + myID + " Proposing: " + proposal);
+				ByzantineAgreement ba = new ByzantineAgreement(proposal,f);
+				Integer agreement = ba.run();
+				System.out.println("nP" + myID + " Agrees on: " + agreement);
+			}else if(processType.equals("-b")){
+				Integer proposal = rand0or1();
+				System.out.println("bP" + myID + " Proposing: " + proposal);
+				ByzantineFaulty bf = new ByzantineFaulty(proposal,f);
+				Integer agreement = bf.run();
+				System.out.println("bP" + myID + " Agrees on: " + agreement);
+			}
 			
 		}catch(IOException e){
 			System.out.println("Socket Error");
@@ -69,6 +80,7 @@ public class Process {
 			BufferedReader in = new BufferedReader(new FileReader(filename));
 			int i=0;
 			numProcesses = Integer.parseInt(in.readLine());
+			f = Integer.parseInt(in.readLine());
 			processes = new ProcessInfo[numProcesses];
 			while(true)
 			{
@@ -89,5 +101,11 @@ public class Process {
 		}catch(IOException e){
 			System.out.println(e);
 		}
+	}
+
+	static private Integer rand0or1(){
+		if(Math.random()<0.5){
+			return new Integer(1);
+		}else return new Integer(0);
 	}
 }

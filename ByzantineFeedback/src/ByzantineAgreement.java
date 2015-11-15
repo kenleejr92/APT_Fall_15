@@ -11,14 +11,19 @@ public class ByzantineAgreement {
 	Integer kingValue;
 	
 	public ByzantineAgreement(Integer proposal, Integer maxFailures){
-		x = proposal;
 		V = new Integer[Process.numProcesses];
-		f=maxFailures;
+		Init(proposal,maxFailures);
+	}
+	
+	public void Init(Integer proposal, Integer maxFailures){
+		x = proposal;
+		f = maxFailures;
+		kingValue = 0;
 		for(int i=0; i<Process.numProcesses; i++){
 			if(Process.myID.equals(i)){
 				V[i]=x;
 			}else{
-				V[i]=0; //default value;
+				V[i]=new Integer(0); //default value;
 			}
 		}
 	}
@@ -28,6 +33,7 @@ public class ByzantineAgreement {
 			//first phase
 			for(Channel c:Process.channelList){
 				if(c!=null){
+					//System.out.println("nP"+Process.myID+" "+V[Process.myID]);
 					c.send("First " + V[Process.myID]);
 				}
 			}
@@ -39,13 +45,13 @@ public class ByzantineAgreement {
 						while(true){
 							try{
 								message = c.readLine();
-								System.out.println(message);
 								break;
 							}catch(IOException e){
 								continue;
 							}
 						}
 						StringTokenizer st = new StringTokenizer(message);
+						
 						if(st.nextToken().equals("First")){
 							V[j]=Integer.parseInt(st.nextToken());
 						}
@@ -53,7 +59,8 @@ public class ByzantineAgreement {
 				}
 			}
 			myValue = Majority();
-		
+			
+			
 			//second phase
 			if(Process.myID.equals(k)){
 				kingValue = myValue;
@@ -70,7 +77,6 @@ public class ByzantineAgreement {
 				while(true){
 					try{
 						message = c.readLine();
-						System.out.println(message);
 						break;
 					}catch(IOException e){
 						continue;
@@ -86,6 +92,9 @@ public class ByzantineAgreement {
 			} else{
 				V[Process.myID] = kingValue;
 			}
+//			c.send("Pulse " + k);
+//			ReceivePulse(k);
+			
 		}
 		return V[Process.myID];
 	}
@@ -117,6 +126,29 @@ public class ByzantineAgreement {
 			return true;
 		}else{
 			return false;
+		}
+	}
+	
+	protected void ReceivePulse(Integer k){
+		for(int j=0; j<Process.numProcesses;j++){
+			if(!Process.myID.equals(j)){
+				Channel c = Process.channelList.get(j);
+				if(c!=null){
+					String message;
+					while(true){
+						try{
+							message = c.readLine();
+							break;
+						}catch(IOException e){
+							continue;
+						}
+					}
+					StringTokenizer st = new StringTokenizer(message);
+					if(st.nextToken().equals("Pulse") && k.equals(Integer.parseInt(st.nextToken()))){
+						break;
+					}
+				}
+			}
 		}
 	}
 }

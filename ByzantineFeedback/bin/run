@@ -1,0 +1,34 @@
+java Process -b 16 &
+sleep 1
+java Process -b 15 &
+sleep 1
+java Process -b 14 &
+sleep 1
+java Process -b 13 &
+sleep 1
+java Process -n 12 &
+sleep 1
+java Process -n 11 &
+sleep 1
+java Process -n 10 &
+sleep 1
+java Process -n 9 &
+sleep 1
+java Process -n 8 &
+sleep 1
+java Process -n 7 &
+sleep 1
+java Process -n 6 &
+sleep 1
+java Process -n 5 &
+sleep 1
+java Process -n 4 &
+sleep 1
+java Process -n 3 &
+sleep 1
+java Process -n 2 &
+sleep 1
+java Process -n 1 &
+sleep 1
+java Process -n 0 &
+echo "Processes Connected"
