@@ -10,7 +10,7 @@ public class Process {
 	public static List<Channel> channelList;
 	public static Random rand;
 	public static Integer f;
-	public static Integer reward = 1;
+	public static Integer correctValue = 1;
 	
 	public static void main(String[] args) throws Exception {
 		if(args.length != 2){
@@ -41,8 +41,8 @@ public class Process {
 				Integer agreement = bf.run();
 				System.out.println("bP" + myID + " Agrees on: " + agreement);
 			}else if(processType.equals("-c")){
-				Integer proposal = reward;
-				System.out.println("cP" + myID + " Proposing: " + reward);
+				Integer proposal = correctValue;
+				System.out.println("cP" + myID + " Proposing: " + correctValue);
 				ByzantineAgreement ba = new ByzantineAgreement(proposal,f);
 				Integer agreement = ba.run();
 				System.out.println("cP" + myID + " Agrees on: " + agreement);
