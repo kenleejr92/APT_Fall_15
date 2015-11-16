@@ -38,7 +38,7 @@ public class ByzantineFeedback {
 				byzantineAgreement.Init(V[j], maxFailures);
 				V[j] = byzantineAgreement.run();
 			}
-			
+			PrintV();
 			
 		}else if(processType.equals("-b")){
 			V[Process.myID] = rand0or1();
@@ -47,7 +47,7 @@ public class ByzantineFeedback {
 				byzantineFaulty.Init(V[j], maxFailures);
 				V[j] = byzantineFaulty.run();
 			}
-			
+			PrintV();
 			
 		}else if(processType.equals("-c")){
 			V[Process.myID] = Process.correctValue;
@@ -56,7 +56,7 @@ public class ByzantineFeedback {
 				byzantineAgreement.Init(V[j], maxFailures);
 				V[j] = byzantineAgreement.run();
 			}
-			
+			PrintV();
 		}
 		 
 	}

@@ -11,6 +11,7 @@ public class Process {
 	public static Random rand;
 	public static Integer f;
 	public static Integer correctValue = 1;
+	public static final Boolean NORMAL_BYZANTINE = false;
 	
 	public static void main(String[] args) throws Exception {
 		if(args.length != 2){
@@ -23,30 +24,31 @@ public class Process {
 		try{
 			ConnectAllServers();
 			Thread.sleep(5000);
-			for(Channel c:channelList){
-				if(c!=null){
-					//System.out.println("Connected to: " + String.valueOf(c.getRemoteID()));
+			if(NORMAL_BYZANTINE){
+				if(processType.equals("-n")){
+					Integer proposal = rand0or1();
+					System.out.println("nP" + myID + " Proposing: " + proposal);
+					ByzantineAgreement ba = new ByzantineAgreement(proposal,f);
+					Integer agreement = ba.run();
+					System.out.println("nP" + myID + " Agrees on: " + agreement);
+				}else if(processType.equals("-b")){
+					Integer proposal = rand0or1();
+					System.out.println("bP" + myID + " Proposing: " + proposal);
+					ByzantineFaulty bf = new ByzantineFaulty(proposal,f);
+					Integer agreement = bf.run();
+					System.out.println("bP" + myID + " Agrees on: " + agreement);
+				}else if(processType.equals("-c")){
+					Integer proposal = correctValue;
+					System.out.println("cP" + myID + " Proposing: " + correctValue);
+					ByzantineAgreement ba = new ByzantineAgreement(proposal,f);
+					Integer agreement = ba.run();
+					System.out.println("cP" + myID + " Agrees on: " + agreement);
 				}
+			}else{
+				ByzantineFeedback bf = new ByzantineFeedback(processType, f);
+				bf.run();
 			}
-			if(processType.equals("-n")){
-				Integer proposal = rand0or1();
-				System.out.println("nP" + myID + " Proposing: " + proposal);
-				ByzantineAgreement ba = new ByzantineAgreement(proposal,f);
-				Integer agreement = ba.run();
-				System.out.println("nP" + myID + " Agrees on: " + agreement);
-			}else if(processType.equals("-b")){
-				Integer proposal = rand0or1();
-				System.out.println("bP" + myID + " Proposing: " + proposal);
-				ByzantineFaulty bf = new ByzantineFaulty(proposal,f);
-				Integer agreement = bf.run();
-				System.out.println("bP" + myID + " Agrees on: " + agreement);
-			}else if(processType.equals("-c")){
-				Integer proposal = correctValue;
-				System.out.println("cP" + myID + " Proposing: " + correctValue);
-				ByzantineAgreement ba = new ByzantineAgreement(proposal,f);
-				Integer agreement = ba.run();
-				System.out.println("cP" + myID + " Agrees on: " + agreement);
-			}
+			
 			
 		}catch(IOException e){
 			System.out.println("Socket Error");
