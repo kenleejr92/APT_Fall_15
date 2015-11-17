@@ -9,12 +9,18 @@ public class ByzantineFeedback {
 	Double[] W;
 	String processType;
 	Integer maxFailures;
+	Integer decided;
+	Double epsilon;
+	Integer rounds;
 	
 	public ByzantineFeedback(String processType, Integer maxFailures) {
 		V = new Integer[Process.numProcesses];
 		W = new Double[Process.numProcesses];
+		epsilon = 0.5;
+		rounds = 10;
 		for(int i=0; i<V.length; i++){
 			V[i] = 0;
+			W[i] = 1.0/Process.numProcesses;
 		}
 		this.maxFailures = maxFailures;
 		this.processType = processType;
@@ -31,34 +37,64 @@ public class ByzantineFeedback {
 	}
 	
 	public void run(){
-		if(processType.equals("-n")){
-			V[Process.myID] = rand0or1();
+		Double s0 = 0.0;
+		Double s1 = 0.0;
+		for(int i=0; i<rounds; i++){
+			switch(processType){
+			case "-n":
+				V[Process.myID] = rand0or1();
+				break;
+			case "-b":
+				V[Process.myID] = rand0or1();
+				break;
+			case "-c":
+				V[Process.myID] = Process.correctValue;
+				break;
+			default:
+				break;
+			}
 			ExchangeValues(V[Process.myID]);
 			for(int j=0;j<V.length;j++){
-				byzantineAgreement.Init(V[j], maxFailures);
-				V[j] = byzantineAgreement.run();
+				switch(processType){
+				case "-n":
+					byzantineAgreement.Init(V[j], maxFailures);
+					V[j] = byzantineAgreement.run();
+					break;
+				case "-b":
+					byzantineFaulty.Init(V[j], maxFailures);
+					V[j] = byzantineFaulty.run();
+					break;
+				case "-c":
+					byzantineAgreement.Init(V[j], maxFailures);
+					V[j] = byzantineAgreement.run();
+					break;
+				default:
+					break;
+				}	
 			}
-			PrintV();
+			//PrintV();
+			for(int j=0; j<W.length; j++){
+				if(V[j].equals(0)){
+					s0 += W[j];
+				}else{
+					s1 += W[j];
+				}
+			}
+			if(s0>=s1) decided = 0;
+			else decided = 1;
 			
-		}else if(processType.equals("-b")){
-			V[Process.myID] = rand0or1();
-			ExchangeValues(V[Process.myID]);
-			for(int j=0;j<V.length;j++){
-				byzantineFaulty.Init(V[j], maxFailures);
-				V[j] = byzantineFaulty.run();
+			if(!decided.equals(Process.correctValue)){
+				System.out.println("Incorrect");
+				//Processes decided incorrectly, need to decrease weights of incorrect processes
+				for(int j=0; j<V.length; j++){
+					if(!V[j].equals(Process.correctValue)){
+						W[j] = (1-epsilon)*W[j];
+					}
+				}
+			}else{
+				System.out.println("Correct");
 			}
-			PrintV();
-			
-		}else if(processType.equals("-c")){
-			V[Process.myID] = Process.correctValue;
-			ExchangeValues(V[Process.myID]);
-			for(int j=0;j<V.length;j++){
-				byzantineAgreement.Init(V[j], maxFailures);
-				V[j] = byzantineAgreement.run();
-			}
-			PrintV();
 		}
-		 
 	}
 	
 	private void ExchangeValues(Integer value){

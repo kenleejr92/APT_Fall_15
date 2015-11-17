@@ -4,8 +4,6 @@ import java.util.StringTokenizer;
 
 
 public class ByzantineFaulty extends ByzantineAgreement {
-
-	private Random rand;
 	
 	public ByzantineFaulty(Integer proposal, Integer maxFailures) {
 		super(proposal, maxFailures);
