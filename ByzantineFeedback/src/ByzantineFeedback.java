@@ -12,12 +12,20 @@ public class ByzantineFeedback {
 	Integer decided;
 	Double epsilon;
 	Integer rounds;
+	Double accuracyPercentage;
+	Double correctDecisions;
+	Double probabilityCorrect = 0.52;
+	Integer byzantineModel = 2;
+	Double[] roundValues;
 	
 	public ByzantineFeedback(String processType, Integer maxFailures) {
 		V = new Integer[Process.numProcesses];
 		W = new Double[Process.numProcesses];
-		epsilon = 0.5;
-		rounds = 10;
+		epsilon = 0.1;
+		rounds = 50;
+		roundValues = new Double[rounds];
+		accuracyPercentage = 0.0;
+		correctDecisions = 0.0;
 		for(int i=0; i<V.length; i++){
 			V[i] = 0;
 			W[i] = 1.0/Process.numProcesses;
@@ -29,7 +37,8 @@ public class ByzantineFeedback {
 			byzantineAgreement = new ByzantineAgreement(init_proposal, maxFailures);
 		}else if(processType.equals("-b")){
 			Integer init_proposal = 0;
-			byzantineFaulty = new ByzantineFaulty(init_proposal, maxFailures);
+//			byzantineFaulty = new ByzantineFaulty(init_proposal, maxFailures);
+			byzantineAgreement = new ByzantineAgreement(init_proposal, maxFailures);
 		}else if(processType.equals("-c")){
 			Integer init_proposal = 0;
 			byzantineAgreement = new ByzantineAgreement(init_proposal, maxFailures);
@@ -40,20 +49,39 @@ public class ByzantineFeedback {
 		Double s0 = 0.0;
 		Double s1 = 0.0;
 		for(int i=0; i<rounds; i++){
+			s0=0.0;
+			s1=0.0;
+			if(Process.myID.equals(12)) System.out.println("Round: " + String.valueOf(i));
 			switch(processType){
 			case "-n":
-				V[Process.myID] = rand0or1();
+				V[Process.myID] = rand0or1(); //normal 
 				break;
 			case "-b":
-				V[Process.myID] = rand0or1();
+				switch(byzantineModel){
+				case 1:
+					V[Process.myID] = 0; //model 1
+					break;
+				case 2:
+					if(i<20) V[Process.myID] = 1;
+					else V[Process.myID] = 0;
+					break;
+				case 3:
+					if(i<40) V[Process.myID] = 1; //model 3
+					else V[Process.myID] = 0; 
+					break;
+				default:
+					break;
+				}
 				break;
 			case "-c":
-				V[Process.myID] = Process.correctValue;
+				V[Process.myID] = 1;  //correct process
 				break;
 			default:
 				break;
 			}
+			//All processes exchange values with each other
 			ExchangeValues(V[Process.myID]);
+			//Makes all V's the same on all non-faulty processes
 			for(int j=0;j<V.length;j++){
 				switch(processType){
 				case "-n":
@@ -61,8 +89,10 @@ public class ByzantineFeedback {
 					V[j] = byzantineAgreement.run();
 					break;
 				case "-b":
-					byzantineFaulty.Init(V[j], maxFailures);
-					V[j] = byzantineFaulty.run();
+//					byzantineFaulty.Init(V[j], maxFailures);
+//					V[j] = byzantineFaulty.run();
+					byzantineAgreement.Init(V[j], maxFailures);
+					V[j] = byzantineAgreement.run();
 					break;
 				case "-c":
 					byzantineAgreement.Init(V[j], maxFailures);
@@ -72,7 +102,6 @@ public class ByzantineFeedback {
 					break;
 				}	
 			}
-			//PrintV();
 			for(int j=0; j<W.length; j++){
 				if(V[j].equals(0)){
 					s0 += W[j];
@@ -84,28 +113,34 @@ public class ByzantineFeedback {
 			else decided = 1;
 			
 			if(!decided.equals(Process.correctValue)){
-				System.out.println("Incorrect");
 				//Processes decided incorrectly, need to decrease weights of incorrect processes
+				if(Process.myID.equals(12)) System.out.println("Incorrect");
 				for(int j=0; j<V.length; j++){
 					if(!V[j].equals(Process.correctValue)){
-						W[j] = (1-epsilon)*W[j];
+						W[j] = (1-epsilon)*W[j];			//Multiplicative 
 					}
 				}
 			}else{
-				System.out.println("Correct");
+				if(Process.myID.equals(12)) System.out.println("Correct!");
+				correctDecisions += 1;
 			}
+			if(Process.myID.equals(12)){
+				System.out.println("s0: " + s0);
+				System.out.println("s1: " + s1);
+				PrintV();
+				PrintW();
+			}
+		}
+		accuracyPercentage = correctDecisions/(rounds);
+		if(Process.myID.equals(12)){
+			System.out.println("Accuracy: " + accuracyPercentage);
 		}
 	}
 	
 	private void ExchangeValues(Integer value){
 		for(Channel c:Process.channelList){
 			if(c!=null){
-				if(processType.equals("n") || processType.equals("c")){
-					c.send("Exchange " + V[Process.myID]);
-				} else{
-					c.send("Exchange " + rand0or1());
-				}
-				
+				c.send("Exchange " + V[Process.myID]);
 			}
 		}
 		for(int j=0; j<Process.numProcesses;j++){
@@ -133,7 +168,7 @@ public class ByzantineFeedback {
 	
 	
 	private Integer rand0or1(){
-		if(Math.random()<0.5){
+		if(Math.random() <= probabilityCorrect){
 			return new Integer(1);
 		}else return new Integer(0);
 	}
@@ -143,6 +178,15 @@ public class ByzantineFeedback {
 		sb.append(processType + "P" + Process.myID + " Vector: ");
 		for(int i=0; i<Process.numProcesses; i++){
 			sb.append(V[i] + " ");
+		}
+		System.out.println(sb);
+	}
+	
+	private void PrintW(){
+		StringBuilder sb = new StringBuilder("");
+		sb.append(processType + "P" + Process.myID + " Weights: ");
+		for(int i=0; i<Process.numProcesses; i++){
+			sb.append(W[i] + " ");
 		}
 		System.out.println(sb);
 	}

@@ -92,8 +92,6 @@ public class ByzantineAgreement {
 			} else{
 				V[Process.myID] = kingValue;
 			}
-//			c.send("Pulse " + k);
-//			ReceivePulse(k);
 			
 		}
 		return V[Process.myID];
