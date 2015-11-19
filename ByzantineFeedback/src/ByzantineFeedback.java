@@ -11,21 +11,25 @@ public class ByzantineFeedback {
 	Integer maxFailures;
 	Integer decided;
 	Double epsilon;
-	Integer rounds;
 	Double accuracyPercentage;
 	Double correctDecisions;
 	Double probabilityCorrect = 0.52;
-	Integer byzantineModel = 2;
-	Double[] roundValues;
+	Integer byzantineModel = 3;
+	Double highWeightAccuracy;
+	Integer highWeightRounds;
+	Double highWeightCorrect;
+	Double maxWeight;
 	
 	public ByzantineFeedback(String processType, Integer maxFailures) {
 		V = new Integer[Process.numProcesses];
 		W = new Double[Process.numProcesses];
 		epsilon = 0.1;
-		rounds = 50;
-		roundValues = new Double[rounds];
 		accuracyPercentage = 0.0;
 		correctDecisions = 0.0;
+		highWeightAccuracy = 0.0;
+		highWeightCorrect = 0.0;
+		highWeightRounds = 0;
+		maxWeight = max(Process.roundWeights);
 		for(int i=0; i<V.length; i++){
 			V[i] = 0;
 			W[i] = 1.0/Process.numProcesses;
@@ -48,9 +52,10 @@ public class ByzantineFeedback {
 	public void run(){
 		Double s0 = 0.0;
 		Double s1 = 0.0;
-		for(int i=0; i<rounds; i++){
+		for(int i=0; i<Process.numRounds; i++){
 			s0=0.0;
 			s1=0.0;
+			if(Process.roundWeights[i]>8) highWeightRounds += 1;
 			if(Process.myID.equals(12)) System.out.println("Round: " + String.valueOf(i));
 			switch(processType){
 			case "-n":
@@ -62,11 +67,11 @@ public class ByzantineFeedback {
 					V[Process.myID] = 0; //model 1
 					break;
 				case 2:
-					if(i<20) V[Process.myID] = 1;
+					if(i<20) V[Process.myID] = 1; //model 2
 					else V[Process.myID] = 0;
 					break;
 				case 3:
-					if(i<40) V[Process.myID] = 1; //model 3
+					if(Process.roundWeights[i]<=8) V[Process.myID] = 1; //model 3
 					else V[Process.myID] = 0; 
 					break;
 				default:
@@ -102,6 +107,8 @@ public class ByzantineFeedback {
 					break;
 				}	
 			}
+			
+			//Compute counts for ones and zeros
 			for(int j=0; j<W.length; j++){
 				if(V[j].equals(0)){
 					s0 += W[j];
@@ -109,31 +116,38 @@ public class ByzantineFeedback {
 					s1 += W[j];
 				}
 			}
+			//Determine decided value
 			if(s0>=s1) decided = 0;
 			else decided = 1;
 			
+			//Determine if decided value is correct
 			if(!decided.equals(Process.correctValue)){
 				//Processes decided incorrectly, need to decrease weights of incorrect processes
 				if(Process.myID.equals(12)) System.out.println("Incorrect");
 				for(int j=0; j<V.length; j++){
 					if(!V[j].equals(Process.correctValue)){
-						W[j] = (1-epsilon)*W[j];			//Multiplicative 
+//						W[j] = (1-epsilon)*W[j];			//Multiplicative 
+						W[j] = (1-Math.abs(Process.roundWeights[i]/maxWeight))*W[j]; //Weighted Round
 					}
 				}
 			}else{
 				if(Process.myID.equals(12)) System.out.println("Correct!");
+				if(Process.roundWeights[i]>8) highWeightCorrect += 1;
 				correctDecisions += 1;
 			}
 			if(Process.myID.equals(12)){
+				System.out.println("Weight: " + Process.roundWeights[i]);
 				System.out.println("s0: " + s0);
 				System.out.println("s1: " + s1);
 				PrintV();
 				PrintW();
 			}
 		}
-		accuracyPercentage = correctDecisions/(rounds);
+		accuracyPercentage = correctDecisions/(Process.numRounds);
+		highWeightAccuracy = highWeightCorrect/(highWeightRounds);
 		if(Process.myID.equals(12)){
 			System.out.println("Accuracy: " + accuracyPercentage);
+			System.out.println("High Weight Accuracy: " + highWeightAccuracy);
 		}
 	}
 	
@@ -191,4 +205,11 @@ public class ByzantineFeedback {
 		System.out.println(sb);
 	}
 
+	private Double max(Double[] arr){
+		Double max = arr[0];
+		for(int i=0; i<arr.length; i++){
+			if(arr[i]>max) max = arr[i];
+		}
+		return max;
+	}
 }

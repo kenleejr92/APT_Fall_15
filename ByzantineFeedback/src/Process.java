@@ -12,6 +12,8 @@ public class Process {
 	public static Integer f;
 	public static Integer correctValue = 1;
 	public static final Boolean NORMAL_BYZANTINE = false;
+	public static Integer numRounds;
+	public static Double[] roundWeights;
 	
 	public static void main(String[] args) throws Exception {
 		if(args.length != 2){
@@ -58,12 +60,12 @@ public class Process {
 	
 	static private void ConnectAllServers() throws IOException{
 		readProcessFile("Processes.txt");
+		readWeightsFile("RoundWeights.txt");
 		channelList = new ArrayList<>(numProcesses);
 		ServerSocket listener = new ServerSocket(processes[Process.myID].portNum, 0, processes[Process.myID].IP);
 		/* accept connections from all the smaller processes */
         for (int i = 0; i < myID; i++) {
             Socket s = listener.accept(); 
-            //s.setSoTimeout(5000);
             BufferedReader dIn = new BufferedReader(
             new InputStreamReader(s.getInputStream()));
             PrintWriter dOut = new PrintWriter(s.getOutputStream());
@@ -74,7 +76,6 @@ public class Process {
         /* contact all the bigger processes */
         for (int i = myID + 1; i < numProcesses; i++) {
             Socket s = new Socket(processes[i].IP, processes[i].portNum);
-            //s.setSoTimeout(5000);
             BufferedReader dIn = new BufferedReader(new
             InputStreamReader(s.getInputStream()));
             PrintWriter dOut = new PrintWriter(s.getOutputStream());
@@ -109,6 +110,30 @@ public class Process {
 			System.out.println(e);
 		}catch(IOException e){
 			System.out.println(e);
+		}
+	}
+	
+	static private void readWeightsFile(String filename){
+		try{
+			BufferedReader in = new BufferedReader(new FileReader(filename));
+			int i=0;
+			numRounds = Integer.parseInt(in.readLine());
+			roundWeights = new Double[numRounds];
+			while(true)
+			{
+				String line = in.readLine();
+				if(line == null){
+					in.close();
+					break;
+				}
+				roundWeights[i++] = Double.parseDouble(line);
+			}
+		}catch(FileNotFoundException e){
+			System.out.println(e);
+		}catch(IOException e){
+			System.out.println(e);
+		}catch(NumberFormatException e){
+			//do nothing
 		}
 	}
 
