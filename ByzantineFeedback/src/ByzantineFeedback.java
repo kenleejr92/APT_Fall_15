@@ -19,6 +19,10 @@ public class ByzantineFeedback {
 	Integer highWeightRounds;
 	Double highWeightCorrect;
 	Double maxWeight;
+	Double correctWeight;
+	Double totalWeight;
+	Double runningMax;
+	Integer switchRound;
 	
 	public ByzantineFeedback(String processType, Integer maxFailures) {
 		V = new Integer[Process.numProcesses];
@@ -29,6 +33,10 @@ public class ByzantineFeedback {
 		highWeightAccuracy = 0.0;
 		highWeightCorrect = 0.0;
 		highWeightRounds = 0;
+		correctWeight = 0.0;
+		totalWeight = 0.0;
+		switchRound = 30;
+		runningMax = Process.roundWeights[0];
 		maxWeight = max(Process.roundWeights);
 		for(int i=0; i<V.length; i++){
 			V[i] = 0;
@@ -55,6 +63,7 @@ public class ByzantineFeedback {
 		for(int i=0; i<Process.numRounds; i++){
 			s0=0.0;
 			s1=0.0;
+			if(Process.roundWeights[i]>runningMax) runningMax = Process.roundWeights[i];
 			if(Process.roundWeights[i]>8) highWeightRounds += 1;
 			if(Process.myID.equals(12)) System.out.println("Round: " + String.valueOf(i));
 			switch(processType){
@@ -127,11 +136,17 @@ public class ByzantineFeedback {
 				for(int j=0; j<V.length; j++){
 					if(!V[j].equals(Process.correctValue)){
 //						W[j] = (1-epsilon)*W[j];			//Multiplicative 
-						W[j] = (1-Math.abs(Process.roundWeights[i]/maxWeight))*W[j]; //Weighted Round
+//						W[j] = (1-Math.abs(Process.roundWeights[i]/maxWeight))*W[j]; //Weighted Round
+						if(i >= switchRound){
+							if(Process.roundWeights[i].equals(runningMax)) W[j] = (1-epsilon)*W[j];
+							else W[j] = (1-Math.abs(Process.roundWeights[i]/runningMax))*W[j];
+						}
+						else W[j] = (1-epsilon)*W[j];
 					}
 				}
 			}else{
 				if(Process.myID.equals(12)) System.out.println("Correct!");
+				correctWeight += Process.roundWeights[i];
 				if(Process.roundWeights[i]>8) highWeightCorrect += 1;
 				correctDecisions += 1;
 			}
@@ -148,6 +163,7 @@ public class ByzantineFeedback {
 		if(Process.myID.equals(12)){
 			System.out.println("Accuracy: " + accuracyPercentage);
 			System.out.println("High Weight Accuracy: " + highWeightAccuracy);
+			System.out.println("Correct Weight: " + correctWeight);
 		}
 	}
 	
