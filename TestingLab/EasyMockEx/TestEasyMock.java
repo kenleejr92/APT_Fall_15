@@ -9,14 +9,14 @@ import junit.framework.*;
 import java.util.ArrayList;
 import static org.easymock.EasyMock.*;
 
-public class TestMp3Player extends TestCase {
+public class TestEasyMock extends TestCase {
 
   protected Mp3Player mp3;
   protected ArrayList list = new ArrayList();
   protected Mp3Player mp3_control;
   
   public void setUp() {
-    mp3 = new MockMp3Player();
+    mp3 = createMock(Mp3Player.class);
       
     list = new ArrayList();
     list.add("Bill Chase -- Open Up Wide");
@@ -25,8 +25,15 @@ public class TestMp3Player extends TestCase {
     list.add("Carl Orff -- O Fortuna");
   }
 
-  public void testPlay() {
-    
+  public void testPlay() { 
+    expect(mp3.loadSongs(list)).andReturn();
+    expect(mp3.play()).andReturn();
+    expect(mp3.pause()).andReturn();
+    expect(mp3.stop()).andReturn();
+    expect(mp3.isPlaying()).andReturn(false).andReturn(true);
+    expect(mp3.currentPosition()).andReturn(5.0).andReturn(5.0).andReturn(0.0);
+    replay(mp3);
+
     mp3.loadSongs(list);
     assertFalse(mp3.isPlaying());
     mp3.play();
@@ -40,7 +47,12 @@ public class TestMp3Player extends TestCase {
   }
 
   public void testPlayNoList() {
-
+    expect(mp3.loadSongs(list)).andReturn();
+    expect(mp3.play()).andReturn();
+    expect(mp3.pause()).andReturn();
+    expect(mp3.stop()).andReturn();
+    expect(mp3.isPlaying()).andReturn(false).andReturn(true);
+    expect(mp3.currentPosition()).andReturn(5.0).andReturn(5.0).andReturn(0.0);
     // Don't set the list up
     assertFalse(mp3.isPlaying());
     mp3.play();
@@ -55,7 +67,12 @@ public class TestMp3Player extends TestCase {
   }
 
   public void testAdvance() {
-
+    expect(mp3.loadSongs(list)).andReturn();
+    expect(mp3.play()).andReturn();
+    expect(mp3.pause()).andReturn();
+    expect(mp3.stop()).andReturn();
+    expect(mp3.isPlaying()).andReturn(false).andReturn(true);
+    expect(mp3.currentPosition()).andReturn(5.0).andReturn(5.0).andReturn(0.0);
     mp3.loadSongs(list);
 
     mp3.play();
