@@ -19,6 +19,8 @@ public class SigninFragent extends Fragment {
 
     private SigninListener mListener;
     private EditText edit_username;
+    private EditText edit_phoneNumber;
+    private EditText edit_email;
     private Context context;
 
     public static SigninFragent newInstance(String param1, String param2) {
@@ -45,20 +47,27 @@ public class SigninFragent extends Fragment {
         title.setTypeface(custom_font);
 
         edit_username = (EditText)mRootView.findViewById(R.id.signin_text);
+        edit_phoneNumber = (EditText)mRootView.findViewById(R.id.phone_number_enter);
+        edit_email = (EditText) mRootView.findViewById(R.id.email_enter);
+
         Button submit_buton = (Button)mRootView.findViewById(R.id.submit_signin);
         submit_buton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 try {
                     String username = edit_username.getText().toString();
-                    if(username.equals(null)||username.equals("")){
+                    String phone_number = edit_phoneNumber.getText().toString();
+                    String email = edit_email.getText().toString();
+                    if(username.equals(null)|| username.equals("") ||
+                            phone_number.equals(null) || phone_number.equals("") ||
+                            email.equals(null) || email.equals("")){
                         throw new IllegalArgumentException();
                     }else{
-                        mListener.onSignedIn(username);
+                        mListener.onSignedIn(username,phone_number,email);
                     }
                 } catch (IllegalArgumentException e) {
                     Context context = getActivity();
-                    CharSequence text = "Must Specify a Username";
+                    CharSequence text = "Incomplete Form";
                     int duration = Toast.LENGTH_SHORT;
                     Toast toast = Toast.makeText(context, text, duration);
                     toast.show();
@@ -88,7 +97,7 @@ public class SigninFragent extends Fragment {
     }
 
     public interface SigninListener {
-        public void onSignedIn(String username);
+        public void onSignedIn(String username, String phone_number, String email);
     }
 
 }

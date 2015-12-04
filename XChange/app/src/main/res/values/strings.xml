@@ -13,4 +13,6 @@
     <string name="table_title">Nearby Devices</string>
     <string name="send_button">Send Contacts</string>
     <string name="title">XChange</string>
+    <string name="phone_number">Phone Number?</string>
+    <string name="email">Email?</string>
 </resources>

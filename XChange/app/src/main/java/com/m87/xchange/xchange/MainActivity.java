@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.ContentResolver;
+import android.database.Cursor;
+import android.provider.ContactsContract;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -37,7 +40,9 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
     public static int myID = 7;
     //public static int myID = 17;
 
-    public String username;
+    public static String USER_NAME;
+    public static String USER_PHONE_NUMBER;
+    public static String USER_EMAIL;
 
     private class XChangeCallbacks implements M87Callbacks
     {
@@ -160,8 +165,8 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
 
             // Restore preferences
             settings = getPreferences(MODE_PRIVATE);
-            username = settings.getString("Username","false");
-            if(username.equals("false")){
+            USER_NAME = settings.getString("Username","false");
+            if(USER_NAME.equals("false")){
                 //No username specified, render signin fragment
                 mSigninFragment = new SigninFragent();
                 mSigninFragment.setArguments(getIntent().getExtras());
@@ -188,7 +193,7 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
         editor = settings.edit();
         editor.clear();
         editor.commit();
-        Log.d("KHL","Deleted username");
+        Log.d("KHL","Deleted user data");
         /**************************************************************/
     }
 
@@ -215,12 +220,19 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
     }
 
     @Override
-    public void onSignedIn(String username){
+    public void onSignedIn(String username, String phone_number, String email){
         //Store the username
+        USER_NAME = username;
+        USER_PHONE_NUMBER = phone_number;
+        USER_EMAIL = email;
         settings = getPreferences(MODE_PRIVATE);
         editor = settings.edit();
-        editor.putString("Username", username);
+        editor.putString("Username", USER_NAME);
+        editor.putString("Phonenumber",USER_PHONE_NUMBER);
+        editor.putString("Useremail",USER_EMAIL);
         editor.commit();
+
+        //Post data to server
 
         // Create a new Fragment to be placed in the activity layout
         mHomeScreenFragment = new HomeScreenFragment();
