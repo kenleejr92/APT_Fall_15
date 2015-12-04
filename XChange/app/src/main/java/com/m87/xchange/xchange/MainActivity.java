@@ -3,15 +3,24 @@ package com.m87.xchange.xchange;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.preference.PreferenceActivity;
 import android.provider.ContactsContract;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.Toast;
 
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.m87.sdk.M87Action;
 import com.m87.sdk.M87Callbacks;
 import com.m87.sdk.M87Event;
@@ -20,6 +29,13 @@ import com.m87.sdk.M87NearEntryState;
 import com.m87.sdk.M87NearMsgEntry;
 import com.m87.sdk.M87StatusCode;
 
+import org.apache.http.Header;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONStringer;
+
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +51,7 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
     private SigninFragent mSigninFragment;
     private SharedPreferences settings;
     private SharedPreferences.Editor editor;
+    private Context context;
 
     public static M87Api mApi;
     public static int myID = 7;
@@ -43,6 +60,7 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
     public static String USER_NAME;
     public static String USER_PHONE_NUMBER;
     public static String USER_EMAIL;
+    public String neighbor_name;
 
     private class XChangeCallbacks implements M87Callbacks
     {
@@ -91,7 +109,7 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
             mNearbyFragment.neighborList.clear();
             for (M87NearEntry n : neighbors)
             {
-                mNearbyFragment.neighborList.add(n);
+                getNameFromID(n.id(),n);
             }
             if(mNearbyFragment!=null){
                 mNearbyFragment.display();
@@ -149,6 +167,7 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context = this;
         mApi = new M87Api(this, new XChangeCallbacks());
         mApi.initialize(this);
 
@@ -193,7 +212,7 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
         editor = settings.edit();
         editor.clear();
         editor.commit();
-        Log.d("KHL","Deleted user data");
+        Log.d("KHL", "Deleted user data");
         /**************************************************************/
     }
 
@@ -233,10 +252,10 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
         editor.commit();
 
         //Post data to server
-
+        String register_url="http://xchange-1132.appspot.com/register_user";
+        postToServer(register_url);
         // Create a new Fragment to be placed in the activity layout
         mHomeScreenFragment = new HomeScreenFragment();
-
         // In case this activity was started with special instructions from an
         // Intent, pass the Intent's extras to the fragment as arguments
         mHomeScreenFragment.setArguments(getIntent().getExtras());
@@ -266,6 +285,8 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
     @Override
     public void onPendingPressed(){
         // Create fragment and give it an argument specifying the article it should show
+
+
         mPendingRequestsFragment = new PendingRequestsFragment();
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -288,6 +309,62 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
     public void onSendContacts(){
 
     }
+
+    private void postToServer(String upload_url){
+        RequestParams params = new RequestParams();
+        params.put("user_name",USER_NAME);
+        params.put("user_id",String.valueOf(myID));
+        params.put("phone_number",USER_PHONE_NUMBER);
+        params.put("email",USER_EMAIL);
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.post(upload_url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                Log.w("async", "success!!!!");
+                Toast.makeText(context, "Upload Successful", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                Log.e("Posting_to_blob", "There was a problem in retrieving the url : " + e.toString());
+                Toast.makeText(context, "Upload Unsuccessful", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void getNameFromID(Integer ID, M87NearEntry m87ne){
+        RequestParams params = new RequestParams();
+        params.put("user_id",String.valueOf(ID));
+        AsyncHttpClient client = new AsyncHttpClient();
+        String upload_url = "http://xchange-1132.appspot.com/request_name";
+        client.post(upload_url, params, new AsyncHttpResponseHandler() {
+            private M87NearEntry n;
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                try {
+                    JSONObject jObject = new JSONObject(new String(response));
+                    String name = jObject.getString("user_name");
+                    M87NameEntry nameEntry = new M87NameEntry(name, n);
+                    mNearbyFragment.neighborList.add(nameEntry);
+                } catch (JSONException j) {
+                    System.out.println("JSON Error");
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                Log.e("Posting_to_blob", "There was a problem in retrieving the url : " + e.toString());
+                Toast.makeText(context, "Upload Unsuccessful", Toast.LENGTH_SHORT).show();
+            }
+
+            private AsyncHttpResponseHandler init(M87NearEntry m87ne){
+                n = m87ne;
+                return this;
+            }
+        }.init(m87ne) );
+
+    }
+
 
 }
 

@@ -16,9 +16,13 @@
 #
 import webapp2
 from Handlers.RegisterHandler import RegisterHandler
+from Handlers.NameHandler import NameHandler
+from Handlers.GetContactsHandler import GetContactsHandler
 
 app = webapp2.WSGIApplication([
-    ('/', RegisterHandler)
+    ('/register_user', RegisterHandler),
+    ('/request_name.*', NameHandler),
+    ('/get_contacts.*', GetContactsHandler)
 
 ], debug=True)
 

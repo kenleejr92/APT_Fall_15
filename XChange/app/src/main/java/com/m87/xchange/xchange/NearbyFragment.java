@@ -1,10 +1,17 @@
 package com.m87.xchange.xchange;
 
 import android.app.Activity;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.RemoteException;
+import android.provider.ContactsContract;
+import android.provider.UserDictionary;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +26,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.m87.sdk.M87Action;
 import com.m87.sdk.M87Callbacks;
 import com.m87.sdk.M87Event;
@@ -26,6 +36,10 @@ import com.m87.sdk.M87NearEntry;
 import com.m87.sdk.M87NearEntryState;
 import com.m87.sdk.M87NearMsgEntry;
 import com.m87.sdk.M87StatusCode;
+
+import org.apache.http.Header;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,7 +49,7 @@ import java.util.Set;
 public class NearbyFragment extends Fragment {
 
     private NearbyListener mListener;
-    public static ArrayList<M87NearEntry> neighborList = new ArrayList<M87NearEntry>();
+    public static ArrayList<M87NameEntry> neighborList = new ArrayList<M87NameEntry>();
     public static ArrayAdapter neighborListAdapter;
     private ListView neighborListView;
     private Context context;
@@ -71,6 +85,7 @@ public class NearbyFragment extends Fragment {
                              Bundle savedInstanceState) {
         ViewGroup mRootView = (ViewGroup) inflater.inflate(R.layout.fragment_nearby, null);
         neighborListAdapter = new RouteArrayAdapter(this.context, neighborList);
+
         neighborListView = (ListView) mRootView.findViewById(R.id.neighbor_listview);
         neighborListView.setAdapter(neighborListAdapter);
         neighborListView.setClickable(true);
@@ -81,6 +96,9 @@ public class NearbyFragment extends Fragment {
     public class neighborClickListener implements AdapterView.OnItemClickListener {
         public void onItemClick(AdapterView parentView, View childView, int position, long id) {
             Log.d("KHL","Selected a nearby entry");
+            //get phone number and email from server and add to contacts
+            M87NameEntry n = neighborList.get(position);
+            getContactsAndAdd(n.id());
         }
     }
 
@@ -103,7 +121,7 @@ public class NearbyFragment extends Fragment {
 
     public class RouteArrayAdapter extends ArrayAdapter<M87NearEntry> {
         private Context context;
-        private ArrayList routingTable;
+        public ArrayList routingTable;
 
         public RouteArrayAdapter(Context context, ArrayList routingTable) {
             super(context, R.layout.section_route_table, routingTable);
@@ -121,16 +139,93 @@ public class NearbyFragment extends Fragment {
             }
             else rowView = convertView;
 
-            M87NearEntry n = (M87NearEntry) this.routingTable.get(position);
+            M87NameEntry n = (M87NameEntry) this.routingTable.get(position);
             Log.d("KHL", String.valueOf(n.id()));
             TextView id = (TextView) rowView.findViewById(R.id.device_id);
             if(id!=null){
-                id.setText(String.valueOf(n.id()));
+                id.setText(n.name);
             }
+
 
 
             return rowView;
         }
+    }
+
+    private void getContactsAndAdd(Integer ID) {
+        RequestParams params = new RequestParams();
+        params.put("user_id", String.valueOf(ID));
+        AsyncHttpClient client = new AsyncHttpClient();
+        String upload_url = "http://xchange-1132.appspot.com/get_contacts";
+        client.post(upload_url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                try {
+                    JSONObject jObject = new JSONObject(new String(response));
+                    String phone_number = jObject.getString("phone_number");
+                    String email = jObject.getString("email");
+                    String name = jObject.getString("user_name");
+                    addToContacts(name,phone_number,email);
+                } catch (JSONException j) {
+                    System.out.println("JSON Error");
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                Log.e("Posting_to_blob", "There was a problem in retrieving the url : " + e.toString());
+                Toast.makeText(context, "Upload Unsuccessful", Toast.LENGTH_SHORT).show();
+            }
+
+            public void addToContacts(String displayName, String number, String email)
+            {
+                Context contetx 	= context; //Application's context or Activity's context
+                String strDisplayName 	=  displayName; // Name of the Person to add
+                String strNumber 	=  number; //number of the person to add with the Contact
+
+                ArrayList<ContentProviderOperation> cntProOper = new ArrayList<ContentProviderOperation>();
+                int contactIndex = cntProOper.size();//ContactSize
+
+                //Newly Inserted contact
+                // A raw contact will be inserted ContactsContract.RawContacts table in contacts database.
+                cntProOper.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)//Step1
+                        .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                        .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null).build());
+
+                //Display name will be inserted in ContactsContract.Data table
+                cntProOper.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)//Step2
+                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID,contactIndex)
+                        .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                        .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, strDisplayName) // Name of the contact
+                        .build());
+                //Mobile number will be inserted in ContactsContract.Data table
+                cntProOper.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)//Step 3
+                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID,contactIndex)
+                        .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                        .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, strNumber) // Number to be added
+                        .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE).build()); //Type like HOME, MOBILE etc
+                //email added to contracts
+                cntProOper.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID,contactIndex)
+                        .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                        .withValue(ContactsContract.CommonDataKinds.Email.ADDRESS, email) // Number to be added
+                        .withValue(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_HOME).build());
+                try
+                {
+                    // We will do batch operation to insert all above data
+                    //Contains the output of the app of a ContentProviderOperation.
+                    //It is sure to have exactly one of uri or count set
+                    ContentProviderResult[] contentProresult = null;
+                    contentProresult = context.getContentResolver().applyBatch(ContactsContract.AUTHORITY, cntProOper); //apply above data insertion into contacts list
+                }
+                catch (RemoteException exp)
+                {
+                    //logs;
+                } catch (OperationApplicationException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }
 

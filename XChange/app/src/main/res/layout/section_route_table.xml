@@ -8,6 +8,6 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:id="@+id/device_id"
-        android:textSize="20sp"/>
+        android:textSize="28sp"/>
 
 </RelativeLayout>

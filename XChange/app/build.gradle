@@ -28,4 +28,8 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.m87.sdk:m87sdk:1.0.3@aar'
+    compile 'com.google.code.gson:gson:2.2.+'
+    compile 'com.loopj.android:android-async-http:1.4.5'
+    compile 'org.apache.httpcomponents:httpcore:4.3.2'
+
 }
