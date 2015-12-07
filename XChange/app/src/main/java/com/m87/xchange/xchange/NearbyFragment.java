@@ -41,14 +41,15 @@ import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.FileOutputStream;
 
 
 public class NearbyFragment extends Fragment {
-
-    private NearbyListener mListener;
     public static ArrayList<M87NameEntry> neighborList = new ArrayList<M87NameEntry>();
     public static ArrayAdapter neighborListAdapter;
     private ListView neighborListView;
@@ -67,7 +68,6 @@ public class NearbyFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (NearbyListener) activity;
             this.context = getActivity().getApplicationContext();
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -88,31 +88,19 @@ public class NearbyFragment extends Fragment {
 
         neighborListView = (ListView) mRootView.findViewById(R.id.neighbor_listview);
         neighborListView.setAdapter(neighborListAdapter);
-        neighborListView.setClickable(true);
-        neighborListView.setOnItemClickListener(new neighborClickListener());
+        //neighborListView.setClickable(true);
+        //neighborListView.setOnItemClickListener(new neighborClickListener());
         return mRootView;
     }
 
-    public class neighborClickListener implements AdapterView.OnItemClickListener {
-        public void onItemClick(AdapterView parentView, View childView, int position, long id) {
-            Log.d("KHL","Selected a nearby entry");
-            //get phone number and email from server and add to contacts
-            M87NameEntry n = neighborList.get(position);
-            getContactsAndAdd(n.id());
-        }
-    }
-
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onSendContacts();
-        }
-    }
-
-
-    //Implemented by Main Activity
-    public interface NearbyListener {
-        public void onSendContacts();
-    }
+//    public class neighborClickListener implements AdapterView.OnItemClickListener {
+//        public void onItemClick(AdapterView parentView, View childView, int position, long id) {
+//            Log.d("KHL","Selected a nearby entry");
+//            //get phone number and email from server and add to contacts
+//            M87NameEntry n = neighborList.get(position);
+//            getContactsAndAdd(n.id());
+//        }
+//    }
 
     public void display()
     {
@@ -142,12 +130,41 @@ public class NearbyFragment extends Fragment {
             M87NameEntry n = (M87NameEntry) this.routingTable.get(position);
             Log.d("KHL", String.valueOf(n.id()));
             TextView id = (TextView) rowView.findViewById(R.id.device_id);
+            Button addContacts = (Button) rowView.findViewById(R.id.add_contacts);
+            addContacts.setOnClickListener(new View.OnClickListener() {
+                int position;
+
+                @Override
+                public void onClick(View v) {
+                    Log.d("KHL", "Selected a nearby entry");
+                    //get phone number and email from server and add to contacts
+                    M87NameEntry n = neighborList.get(position);
+                    getContactsAndAdd(n.id());
+                    //Write to history file
+                    try{
+                        FileOutputStream fos = context.openFileOutput(HistoryFragment.HISTORY_FILE, Context.MODE_PRIVATE);
+                        PrintWriter out = new PrintWriter(new BufferedOutputStream(fos));
+                        out.println(String.valueOf(n.id()) + " ");
+                        out.close();
+                        fos.close();
+                    }catch(Exception e){
+                        System.out.println(e);
+                    }
+
+
+
+
+                }
+
+                private View.OnClickListener init(int pos) {
+                    position = pos;
+                    return this;
+                }
+            }.init(position));
+
             if(id!=null){
                 id.setText(n.name);
             }
-
-
-
             return rowView;
         }
     }

@@ -16,4 +16,7 @@
     <string name="phone_number">Phone Number?</string>
     <string name="email">Email?</string>
     <string name="add_contact">Add Contacts</string>
+    <string name="history">History</string>
+    <string name="search">Search</string>
+    <string name="XChange">XChange</string>
 </resources>

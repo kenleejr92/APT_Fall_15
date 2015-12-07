@@ -1,21 +1,19 @@
 package com.m87.xchange.xchange;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.ContentResolver;
-import android.database.Cursor;
-import android.preference.PreferenceActivity;
-import android.provider.ContactsContract;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -30,24 +28,16 @@ import com.m87.sdk.M87NearMsgEntry;
 import com.m87.sdk.M87StatusCode;
 
 import org.apache.http.Header;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
-
-import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 
-public class MainActivity extends Activity implements HomeScreenFragment.HomeScreenListener,
-        PendingRequestsFragment.PendingRequestsListener, NearbyFragment.NearbyListener, SigninFragent.SigninListener{
 
-    private HomeScreenFragment mHomeScreenFragment;
+public class MainActivity extends Activity implements SigninFragent.SigninListener{
+
+    private HistoryFragment mHistoryFragment;
+    private SearchFragment mSearchFragment;
     private NearbyFragment mNearbyFragment;
-    private PendingRequestsFragment mPendingRequestsFragment;
     private SigninFragent mSigninFragment;
     private SharedPreferences settings;
     private SharedPreferences.Editor editor;
@@ -63,6 +53,8 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
     public static String USER_PHONE_NUMBER;
     public static String USER_EMAIL;
     public String neighbor_name;
+
+    static final int NUM_ITEMS = 3;
 
     private class XChangeCallbacks implements M87Callbacks
     {
@@ -170,6 +162,7 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this;
+
         mApi = new M87Api(this, new XChangeCallbacks());
         mApi.initialize(this);
 
@@ -193,10 +186,11 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
                 mSigninFragment.setArguments(getIntent().getExtras());
                 getFragmentManager().beginTransaction().add(R.id.fragment_container,mSigninFragment).commit();
             } else {
-                mHomeScreenFragment = new HomeScreenFragment();
-                mHomeScreenFragment.setArguments(getIntent().getExtras());
+                MakeTabs();
+                mNearbyFragment = new NearbyFragment();
+                mNearbyFragment.setArguments(getIntent().getExtras());
                 getFragmentManager().beginTransaction()
-                        .add(R.id.fragment_container, mHomeScreenFragment).commit();
+                        .add(R.id.fragment_container, mNearbyFragment).commit();
             }
         }
     }
@@ -209,13 +203,13 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
     @Override
     protected void onPause(){
         super.onPause();
-        /****************************For Testing************************/
-        settings = getPreferences(MODE_PRIVATE);
-        editor = settings.edit();
-        editor.clear();
-        editor.commit();
-        Log.d("KHL", "Deleted user data");
-        /**************************************************************/
+//        /****************************For Testing************************/
+//        settings = getPreferences(MODE_PRIVATE);
+//        editor = settings.edit();
+//        editor.clear();
+//        editor.commit();
+//        Log.d("KHL", "Deleted user data");
+//        /**************************************************************/
     }
 
     @Override
@@ -256,61 +250,17 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
         //Post data to server
         String register_url="http://xchange-1132.appspot.com/register_user";
         postToServer(register_url);
+        MakeTabs();
         // Create a new Fragment to be placed in the activity layout
-        mHomeScreenFragment = new HomeScreenFragment();
+        mNearbyFragment = new NearbyFragment();
         // In case this activity was started with special instructions from an
         // Intent, pass the Intent's extras to the fragment as arguments
-        mHomeScreenFragment.setArguments(getIntent().getExtras());
+        mNearbyFragment.setArguments(getIntent().getExtras());
 
         // Add the fragment to the 'fragment_container' FrameLayout
-        getFragmentManager().beginTransaction().replace(R.id.fragment_container, mHomeScreenFragment).commit();
+        getFragmentManager().beginTransaction().replace(R.id.fragment_container, mNearbyFragment).commit();
     }
 
-
-    @Override
-    public void onNearbyPressed(){
-        // Create fragment and give it an argument specifying the article it should show
-        mNearbyFragment = new NearbyFragment();
-
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-        // Replace whatever is in the fragment_container view with this fragment,
-        // and add the transaction to the back stack so the user can navigate back
-        transaction.replace(R.id.fragment_container, mNearbyFragment);
-        transaction.addToBackStack(null);
-
-        // Commit the transaction
-        transaction.commit();
-
-    }
-
-    @Override
-    public void onPendingPressed(){
-        // Create fragment and give it an argument specifying the article it should show
-
-
-        mPendingRequestsFragment = new PendingRequestsFragment();
-
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-        // Replace whatever is in the fragment_container view with this fragment,
-        // and add the transaction to the back stack so the user can navigate back
-        transaction.replace(R.id.fragment_container, mPendingRequestsFragment);
-        transaction.addToBackStack(null);
-
-        // Commit the transaction
-        transaction.commit();
-    }
-
-    @Override
-    public void onAddContact(){
-
-    }
-
-    @Override
-    public void onSendContacts(){
-
-    }
 
     private void postToServer(String upload_url){
         RequestParams params = new RequestParams();
@@ -367,6 +317,92 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
 
     }
 
+    public void MakeTabs(){
+        final ActionBar actionBar = getActionBar();
+        // Specify that tabs should be displayed in the action bar.
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
+        // Create a tab listener that is called when the user changes tabs.
+        ActionBar.TabListener tabListenerNearby = new ActionBar.TabListener() {
+            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // Create fragment and give it an argument specifying the article it should show
+                mNearbyFragment = new NearbyFragment();
+
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+                // Replace whatever is in the fragment_container view with this fragment,
+                // and add the transaction to the back stack so the user can navigate back
+                transaction.replace(R.id.fragment_container, mNearbyFragment);
+                transaction.addToBackStack(null);
+
+                // Commit the transaction
+                transaction.commit();
+            }
+
+            public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // hide the given tab
+            }
+
+            public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // probably ignore this event
+            }
+        };
+
+        ActionBar.TabListener tabListenerHistory = new ActionBar.TabListener() {
+            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // Create fragment and give it an argument specifying the article it should show
+                mHistoryFragment = new HistoryFragment();
+
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+                // Replace whatever is in the fragment_container view with this fragment,
+                // and add the transaction to the back stack so the user can navigate back
+                transaction.replace(R.id.fragment_container, mHistoryFragment);
+                transaction.addToBackStack(null);
+
+                // Commit the transaction
+                transaction.commit();
+            }
+
+            public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // hide the given tab
+            }
+
+            public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // probably ignore this event
+            }
+        };
+
+        ActionBar.TabListener tabListenerSearch = new ActionBar.TabListener() {
+            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // Create fragment and give it an argument specifying the article it should show
+                mSearchFragment = new SearchFragment();
+
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+                // Replace whatever is in the fragment_container view with this fragment,
+                // and add the transaction to the back stack so the user can navigate back
+                transaction.replace(R.id.fragment_container, mSearchFragment);
+                transaction.addToBackStack(null);
+
+                // Commit the transaction
+                transaction.commit();
+            }
+
+            public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // hide the given tab
+            }
+
+            public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+                // probably ignore this event
+            }
+        };
+
+        // Add 3 tabs, specifying the tab's text and TabListener
+        actionBar.addTab(actionBar.newTab().setText("Nearby").setTabListener(tabListenerNearby));
+        actionBar.addTab(actionBar.newTab().setText("History").setTabListener(tabListenerHistory));
+        actionBar.addTab(actionBar.newTab().setText("Search").setTabListener(tabListenerSearch));
+
+    }
 }
 
