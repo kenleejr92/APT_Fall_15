@@ -1,0 +1,55 @@
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+
+public class GoogleSuggest {
+    public static void main(String[] args) throws Exception {
+        // The Firefox driver supports javascript 
+        WebDriver driver = new FirefoxDriver();
+        
+        
+        driver.get("http://apt-public.appspot.com/testing-lab-login.html");
+    	WebElement userID = driver.findElement(By.name("userId"));
+        WebElement passwd = driver.findElement(By.name("userPassword"));
+        WebElement submit = driver.findElement(By.xpath("//input[@type='submit']"));
+        userID.clear();
+        passwd.clear();
+        userID.sendKeys("andy");
+        passwd.sendKeys("apple");
+        submit.click();
+        
+        WebElement tempInput = driver.findElement(By.xpath("//input[@type='text']"));
+        WebElement submit_temp = driver.findElement(By.xpath("//input[@type='submit']"));
+        tempInput.clear();
+        for(int i=-30; i<220; i++){
+        	tempInput.sendKeys(String.valueOf(i));
+        	submit_temp.click();
+        	WebElement pickCity = driver.findElement(By.xpath("//input[@value='Austin']"));
+        	pickCity.click();
+        	WebElement submitCity = driver.findElement(By.xpath("//input[@type='submit']"));
+        	submitCity.click();
+        }
+        
+//        //Tests valid users, then case-sensitivity, then lock-out
+//        String[] users = {"andy", "bob", "charlie", "joe", "kim","AnDy","Andy","Andy","Andy","Andy"};
+//        String[] passwords = {"apple","bathtub","china","ok","fine","apple","aPPle","ken","Ok","No"};
+//        
+//        for(int i=0; i<users.length; i++){
+//        	driver.get("http://apt-public.appspot.com/testing-lab-login.html");
+//        	WebElement userID = driver.findElement(By.name("userId"));
+//            WebElement passwd = driver.findElement(By.name("userPassword"));
+//            WebElement submit = driver.findElement(By.xpath("//input[@type='submit']"));
+//            userID.clear();
+//            passwd.clear();
+//            userID.sendKeys(users[i]);
+//            passwd.sendKeys(passwords[i]);
+//            submit.click();
+//        }
+        
+
+        
+    }
+}

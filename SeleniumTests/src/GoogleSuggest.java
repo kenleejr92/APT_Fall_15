@@ -21,20 +21,20 @@ public class GoogleSuggest {
         passwd.sendKeys("apple");
         submit.click();
         
-        //Valid Temperature Testing
-        for(int i=-30; i<220; i++){
-        	WebElement tempInput = driver.findElement(By.xpath("//input[@type='text']"));
-            WebElement submit_temp = driver.findElement(By.xpath("//input[@type='submit']"));
-            tempInput.clear();
-            if(i>50 && i<100) tempInput.sendKeys(String.valueOf(7.08));
-            else tempInput.sendKeys(String.valueOf(i));
-        	submit_temp.click();
-        	WebElement pickCity = driver.findElement(By.xpath("//input[@value='Austin']"));
-        	pickCity.click();
-        	WebElement submitCity = driver.findElement(By.xpath("//input[@type='submit']"));
-        	submitCity.click();
-        	driver.get("http://apt-public.appspot.com/testing-lab-calculator.html");
-        }
+//        //Valid Temperature Testing
+//        for(int i=-30; i<220; i++){
+//        	WebElement tempInput = driver.findElement(By.xpath("//input[@type='text']"));
+//            WebElement submit_temp = driver.findElement(By.xpath("//input[@type='submit']"));
+//            tempInput.clear();
+//            if(i>50 && i<100) tempInput.sendKeys(String.valueOf(7.08));
+//            else tempInput.sendKeys(String.valueOf(i));
+//        	submit_temp.click();
+//        	WebElement pickCity = driver.findElement(By.xpath("//input[@value='Austin']"));
+//        	pickCity.click();
+//        	WebElement submitCity = driver.findElement(By.xpath("//input[@type='submit']"));
+//        	submitCity.click();
+//        	driver.get("http://apt-public.appspot.com/testing-lab-calculator.html");
+//        }
         
         
         //Invalid Temperature testing

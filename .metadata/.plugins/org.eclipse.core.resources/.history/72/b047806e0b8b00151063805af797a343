@@ -1,0 +1,85 @@
+import java.io.IOException;
+import java.util.Random;
+import java.util.StringTokenizer;
+
+
+public class ByzantineFaulty extends ByzantineAgreement {
+
+	private Random rand;
+	
+	public ByzantineFaulty(Integer proposal, Integer maxFailures) {
+		super(proposal, maxFailures);
+	}
+	
+	@Override
+	public Integer run(){
+		for(int k=0; k<f+1; k++){
+			//first phase
+			for(Channel c:Process.channelList){
+				if(c!=null){
+					c.send("First " + rand0or1());
+				}
+			}
+			for(int j=0; j<Process.numProcesses;j++){
+				if(!Process.myID.equals(j)){
+					Channel c = Process.channelList.get(j);
+					if(c!=null){
+						String message;
+						while(true){
+							try{
+								message = c.readLine();
+								break;
+							}catch(IOException e){
+								continue;
+							}
+						}
+						StringTokenizer st = new StringTokenizer(message);
+						if(st.nextToken().equals("First")){
+							st.nextToken();//do nothing
+							//c.send("Ack");
+						}
+					}
+				}
+			}
+			//super.ReceiveAck();
+			myValue = rand0or1();
+		
+			//second phase
+			if(Process.myID.equals(k)){
+				kingValue = myValue;
+				for(Channel c:Process.channelList){
+					if(c!=null){
+						c.send("Second " + myValue);
+					}
+				}
+			}
+			//Receive kingValue from Pk
+			Channel c = Process.channelList.get(k);
+			if(c!=null){
+				String message;
+				while(true){
+					try{
+						message = c.readLine();
+						break;
+					}catch(IOException e){
+						continue;
+					}
+				}
+				StringTokenizer st = new StringTokenizer(message);
+				if(st.nextToken().equals("Second")){
+					st.nextToken();//do nothing
+					//c.send("Ack");
+				}
+			}
+		}
+		//super.ReceiveAck();
+		return rand0or1();
+	}
+	
+	private Integer rand0or1(){
+		if(Math.random()<0.5){
+			return 1;
+		}else return 0;
+	}
+
+}

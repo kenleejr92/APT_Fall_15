@@ -1,0 +1,11 @@
+java Server -i 4 &
+sleep 1
+java Server -i 3 &
+sleep 1
+java Server -i 2 &
+sleep 1
+java Server -i 1 &
+sleep 1
+java Server -i 0 &
+sleep 1
+echo "Servers Connected" 

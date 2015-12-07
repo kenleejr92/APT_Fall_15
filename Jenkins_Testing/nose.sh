@@ -1,5 +1,5 @@
 # needed when adding to Jenkins:
-# cd python/jenkins-testing
+cd python/jenkins-testing
 PYTHONPATH=''
 nosetests --with-xunit --all-modules --traverse-namespace --with-coverage --cover-package=./ --cover-inclusive
 python -m coverage xml --include=./*

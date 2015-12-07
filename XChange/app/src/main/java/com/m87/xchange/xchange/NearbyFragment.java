@@ -174,7 +174,7 @@ public class NearbyFragment extends Fragment {
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                 Log.e("Posting_to_blob", "There was a problem in retrieving the url : " + e.toString());
-                Toast.makeText(context, "Upload Unsuccessful", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, "Upload Unsuccessful", Toast.LENGTH_SHORT).show();
             }
 
             public void addToContacts(String displayName, String number, String email)
@@ -206,7 +206,7 @@ public class NearbyFragment extends Fragment {
                         .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE).build()); //Type like HOME, MOBILE etc
                 //email added to contracts
                 cntProOper.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
-                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID,contactIndex)
+                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, contactIndex)
                         .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
                         .withValue(ContactsContract.CommonDataKinds.Email.ADDRESS, email) // Number to be added
                         .withValue(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_HOME).build());
@@ -217,6 +217,7 @@ public class NearbyFragment extends Fragment {
                     //It is sure to have exactly one of uri or count set
                     ContentProviderResult[] contentProresult = null;
                     contentProresult = context.getContentResolver().applyBatch(ContactsContract.AUTHORITY, cntProOper); //apply above data insertion into contacts list
+                    Toast.makeText(context, displayName + " added to Contacts", Toast.LENGTH_SHORT).show();
                 }
                 catch (RemoteException exp)
                 {

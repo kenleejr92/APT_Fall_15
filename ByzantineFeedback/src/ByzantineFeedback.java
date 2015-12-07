@@ -136,12 +136,12 @@ public class ByzantineFeedback {
 				for(int j=0; j<V.length; j++){
 					if(!V[j].equals(Process.correctValue)){
 //						W[j] = (1-epsilon)*W[j];			//Multiplicative 
-//						W[j] = (1-Math.abs(Process.roundWeights[i]/maxWeight))*W[j]; //Weighted Round
-						if(i >= switchRound){
-							if(Process.roundWeights[i].equals(runningMax)) W[j] = (1-epsilon)*W[j];
-							else W[j] = (1-Math.abs(Process.roundWeights[i]/runningMax))*W[j];
-						}
-						else W[j] = (1-epsilon)*W[j];
+						W[j] = (1-Math.abs(Process.roundWeights[i]/maxWeight))*W[j]; //Weighted Round
+//						if(i >= switchRound){
+//							if(Process.roundWeights[i].equals(runningMax)) W[j] = (1-epsilon)*W[j];
+//							else W[j] = (1-Math.abs(Process.roundWeights[i]/runningMax))*W[j];
+//						}
+//						else W[j] = (1-epsilon)*W[j];
 					}
 				}
 			}else{

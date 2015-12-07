@@ -15,4 +15,5 @@
     <string name="title">XChange</string>
     <string name="phone_number">Phone Number?</string>
     <string name="email">Email?</string>
+    <string name="add_contact">Add Contacts</string>
 </resources>

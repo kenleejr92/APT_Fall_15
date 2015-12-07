@@ -54,8 +54,10 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
     private Context context;
 
     public static M87Api mApi;
-    public static int myID = 7;
+    //public static int myID = 7;
     //public static int myID = 17;
+    //public static int myID = 35;
+    public static int myID = 137;
 
     public static String USER_NAME;
     public static String USER_PHONE_NUMBER;
@@ -327,7 +329,7 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                 Log.e("Posting_to_blob", "There was a problem in retrieving the url : " + e.toString());
-                Toast.makeText(context, "Upload Unsuccessful", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, "Upload Unsuccessful", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -354,7 +356,7 @@ public class MainActivity extends Activity implements HomeScreenFragment.HomeScr
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                 Log.e("Posting_to_blob", "There was a problem in retrieving the url : " + e.toString());
-                Toast.makeText(context, "Upload Unsuccessful", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, "Upload Unsuccessful", Toast.LENGTH_SHORT).show();
             }
 
             private AsyncHttpResponseHandler init(M87NearEntry m87ne){
