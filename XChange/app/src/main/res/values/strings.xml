@@ -19,4 +19,7 @@
     <string name="history">History</string>
     <string name="search">Search</string>
     <string name="XChange">XChange</string>
+    <string name="call">Call</string>
+    <string name="text">Text</string>
+    <string name="email_button">Email</string>
 </resources>

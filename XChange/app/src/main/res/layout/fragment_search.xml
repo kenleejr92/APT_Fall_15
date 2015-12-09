@@ -1,8 +1,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/search"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:orientation="vertical"
     android:background="@color/teal"
     tools:context="com.m87.xchange.xchange.SearchFragment">
 
@@ -15,8 +20,33 @@
         android:textSize="38sp"
         android:id="@+id/title"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="76dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
+
+
+    <ImageButton
+        android:layout_width="55dp"
+        android:layout_height="47dp"
+        android:layout_gravity="right"
+        android:src="@drawable/search"
+        android:id="@+id/imageButton"
+        android:layout_below="@+id/title"
+        android:layout_toEndOf="@+id/search_query" />
+
+    <EditText
+        android:layout_width="243dp"
+        android:layout_height="37dp"
+        android:id="@+id/search_query"
+        android:background="@color/white"
+        android:layout_alignBottom="@+id/imageButton"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/title" />
+
+    <ListView
+        android:id="@+id/search_listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/search_query"
+    />
 
 </RelativeLayout>

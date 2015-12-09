@@ -1,17 +1,35 @@
 package com.m87.xchange.xchange;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.m87.sdk.M87NearEntry;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class HistoryFragment extends Fragment {
-    public static final String HISTORY_FILE = "history_file";
+
+    public ArrayList<Contact> contactHistory;
+    public static ArrayAdapter historyListAdapter;
+    private ListView historyListView;
+    private Context context;
+    public HistoryListener mHistoryListener;
 
     public static HistoryFragment newInstance(String param1, String param2) {
         HistoryFragment fragment = new HistoryFragment();
@@ -33,6 +51,10 @@ public class HistoryFragment extends Fragment {
                              Bundle savedInstanceState) {
         /// Inflate the layout for this fragment
         ViewGroup mRootView = (ViewGroup) inflater.inflate(R.layout.fragment_history, null);
+        historyListAdapter = new RouteArrayAdapter(this.context, contactHistory);
+        historyListView = (ListView) mRootView.findViewById(R.id.history_listview);
+        historyListView.setAdapter(historyListAdapter);
+
         return mRootView;
     }
 
@@ -40,7 +62,9 @@ public class HistoryFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-           ;
+            this.context = getActivity().getApplicationContext();
+            mHistoryListener = (HistoryListener) activity;
+            contactHistory = (ArrayList) MainActivity.databaseHandler.getAllContacts();
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -52,14 +76,78 @@ public class HistoryFragment extends Fragment {
         super.onDetach();
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    public class RouteArrayAdapter extends ArrayAdapter<Contact> {
+        private Context context;
+        public ArrayList historyTable;
+
+        public RouteArrayAdapter(Context context, ArrayList historyTable) {
+            super(context, R.layout.history_table, historyTable);
+            this.context = context;
+            this.historyTable = historyTable;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            View rowView;
+            if (convertView == null) {
+                rowView = inflater.inflate(R.layout.history_table, parent, false);
+            }
+            else rowView = convertView;
+
+            Contact contact = (Contact) this.historyTable.get(position);
+            TextView id = (TextView) rowView.findViewById(R.id.device_id);
+            ImageButton callButton = (ImageButton) rowView.findViewById(R.id.call);
+            ImageButton textButton = (ImageButton) rowView.findViewById(R.id.text);
+            ImageButton emailButton = (ImageButton) rowView.findViewById(R.id.email);
+            callButton.setOnClickListener(new View.OnClickListener() {
+                private Contact contact;
+                @Override
+                public void onClick(View v) {
+                    mHistoryListener.onCallPressed(contact);
+                }
+                private View.OnClickListener init(Contact c){
+                    this.contact = c;
+                    return this;
+                }
+            }.init(contact) );
+
+            textButton.setOnClickListener(new View.OnClickListener() {
+                private Contact contact;
+                @Override
+                public void onClick(View v) {
+                    mHistoryListener.onTextPressed(contact);
+                }
+                private View.OnClickListener init(Contact c){
+                    this.contact = c;
+                    return this;
+                }
+            }.init(contact) );
+
+            emailButton.setOnClickListener(new View.OnClickListener() {
+                private Contact contact;
+                @Override
+                public void onClick(View v) {
+                    mHistoryListener.onEmailPressed(contact);
+                }
+                private View.OnClickListener init(Contact c){
+                    this.contact = c;
+                    return this;
+                }
+            }.init(contact) );
+
+            if(id!=null){
+                id.setText(contact.getName());
+            }
+            return rowView;
+        }
+    }
+
+    //Implemented by MainActivity
+    public interface HistoryListener {
+        public void onCallPressed(Contact c);
+        public void onTextPressed(Contact c);
+        public void onEmailPressed(Contact c);
+    }
 }

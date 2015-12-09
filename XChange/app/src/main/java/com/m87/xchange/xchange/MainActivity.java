@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -31,9 +32,10 @@ import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 
 
-public class MainActivity extends Activity implements SigninFragent.SigninListener{
+public class MainActivity extends Activity implements SigninFragent.SigninListener, HistoryFragment.HistoryListener{
 
     private HistoryFragment mHistoryFragment;
     private SearchFragment mSearchFragment;
@@ -44,10 +46,11 @@ public class MainActivity extends Activity implements SigninFragent.SigninListen
     private Context context;
 
     public static M87Api mApi;
+    public static DatabaseHandler databaseHandler;
     //public static int myID = 7;
     //public static int myID = 17;
-    //public static int myID = 35;
-    public static int myID = 137;
+    public static int myID = 35;
+    //public static int myID = 137;
 
     public static String USER_NAME;
     public static String USER_PHONE_NUMBER;
@@ -155,6 +158,15 @@ public class MainActivity extends Activity implements SigninFragent.SigninListen
         public void onNearSubscribeCancelStatus(int status)
         {
         }
+
+        private boolean hasNewID(int id){
+            for(M87NameEntry n: NearbyFragment.neighborList){
+                if(n.id() == id){
+                    return false;
+                }else continue;
+            }
+            return true;
+        }
     };
 
     @Override
@@ -165,7 +177,7 @@ public class MainActivity extends Activity implements SigninFragent.SigninListen
 
         mApi = new M87Api(this, new XChangeCallbacks());
         mApi.initialize(this);
-
+        databaseHandler = new DatabaseHandler(this);
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
         if (findViewById(R.id.fragment_container) != null) {
@@ -259,6 +271,29 @@ public class MainActivity extends Activity implements SigninFragent.SigninListen
 
         // Add the fragment to the 'fragment_container' FrameLayout
         getFragmentManager().beginTransaction().replace(R.id.fragment_container, mNearbyFragment).commit();
+    }
+
+    @Override
+    public void onCallPressed(Contact contact){
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        intent.setData(Uri.parse("tel:" + contact.getPhoneNumber()));
+        context.startActivity(intent);
+    }
+
+    @Override
+    public void onTextPressed(Contact contact){
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", contact.getPhoneNumber(), null)));
+    }
+
+    @Override
+    public void onEmailPressed(Contact contact) {
+        Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+        sendIntent.setType("plain/text");
+        sendIntent.setData(Uri.parse(contact.getEmail()));
+        sendIntent.setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail");
+        sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[] { contact.getEmail() });
+        sendIntent.putExtra(Intent.EXTRA_SUBJECT, "XChange");
+        startActivity(sendIntent);
     }
 
 

@@ -140,17 +140,7 @@ public class NearbyFragment extends Fragment {
                     //get phone number and email from server and add to contacts
                     M87NameEntry n = neighborList.get(position);
                     getContactsAndAdd(n.id());
-                    //Write to history file
-                    try{
-                        FileOutputStream fos = context.openFileOutput(HistoryFragment.HISTORY_FILE, Context.MODE_PRIVATE);
-                        PrintWriter out = new PrintWriter(new BufferedOutputStream(fos));
-                        out.println(String.valueOf(n.id()) + " ");
-                        out.close();
-                        fos.close();
-                    }catch(Exception e){
-                        System.out.println(e);
-                    }
-
+                    //Write to history to SQLlite database
 
 
 
@@ -183,6 +173,8 @@ public class NearbyFragment extends Fragment {
                     String email = jObject.getString("email");
                     String name = jObject.getString("user_name");
                     addToContacts(name,phone_number,email);
+                    //Add to SQLite database
+                    MainActivity.databaseHandler.addContact(new Contact(name,phone_number,email));
                 } catch (JSONException j) {
                     System.out.println("JSON Error");
                 }
