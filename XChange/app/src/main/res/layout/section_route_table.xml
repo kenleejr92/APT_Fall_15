@@ -20,14 +20,14 @@
         android:id="@+id/add_contacts"
         android:text="@string/add_contact"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_toStartOf="@+id/xchange" />
 
-    <Button
+    <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/XChange"
         android:id="@+id/xchange"
+        android:src="@drawable/businesscard"
         android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/add_contacts" />
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

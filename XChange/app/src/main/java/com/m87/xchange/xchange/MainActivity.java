@@ -4,6 +4,8 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentActivity;
@@ -32,15 +34,18 @@ import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.net.URL;
 import java.util.ArrayList;
 
 
-public class MainActivity extends Activity implements SigninFragent.SigninListener, HistoryFragment.HistoryListener{
+public class MainActivity extends Activity implements SigninFragent.SigninListener, HistoryFragment.HistoryListener, BCListener{
 
     private HistoryFragment mHistoryFragment;
     private SearchFragment mSearchFragment;
     private NearbyFragment mNearbyFragment;
     private SigninFragent mSigninFragment;
+    private ShowBusinessCard mShowBusinessCard;
     private SharedPreferences settings;
     private SharedPreferences.Editor editor;
     private Context context;
@@ -103,10 +108,12 @@ public class MainActivity extends Activity implements SigninFragent.SigninListen
         public void onNearTable(M87NearEntry[] neighbors)
         {
 
-            mNearbyFragment.neighborList.clear();
+            //mNearbyFragment.neighborList.clear();
             for (M87NearEntry n : neighbors)
             {
-                getNameFromID(n.id(),n);
+                if(hasNewID(n.id())){
+                    getNameFromID(n.id(),n);
+                }
             }
             if(mNearbyFragment!=null){
                 mNearbyFragment.display();
@@ -247,7 +254,7 @@ public class MainActivity extends Activity implements SigninFragent.SigninListen
     }
 
     @Override
-    public void onSignedIn(String username, String phone_number, String email){
+    public void onSignedIn(String username, String phone_number, String email, final byte[] encodedImage){
         //Store the username
         USER_NAME = username;
         USER_PHONE_NUMBER = phone_number;
@@ -261,7 +268,7 @@ public class MainActivity extends Activity implements SigninFragent.SigninListen
 
         //Post data to server
         String register_url="http://xchange-1132.appspot.com/register_user";
-        postToServer(register_url);
+        getUploadURL(encodedImage);
         MakeTabs();
         // Create a new Fragment to be placed in the activity layout
         mNearbyFragment = new NearbyFragment();
@@ -296,13 +303,42 @@ public class MainActivity extends Activity implements SigninFragent.SigninListen
         startActivity(sendIntent);
     }
 
+    private void getUploadURL(final byte[] encodedImage){
+        AsyncHttpClient httpClient = new AsyncHttpClient();
+        String request_url="http://xchange-1132.appspot.com/register_user";
+        System.out.println(request_url);
+        httpClient.get(request_url, new AsyncHttpResponseHandler() {
+            String upload_url;
 
-    private void postToServer(String upload_url){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+
+                try {
+                    JSONObject jObject = new JSONObject(new String(response));
+                    upload_url = jObject.getString("upload_url");
+                    postToServer(encodedImage, upload_url);
+                    Log.d("KHL", "Successfully retrieved upload_url");
+
+                } catch (JSONException j) {
+                    System.out.println("JSON Error");
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                Log.e("Get_serving_url", "There was a problem in retrieving the url : " + e.toString());
+            }
+        });
+    }
+
+    private void postToServer(byte[] encodedImage, String upload_url){
         RequestParams params = new RequestParams();
-        params.put("user_name",USER_NAME);
-        params.put("user_id",String.valueOf(myID));
-        params.put("phone_number",USER_PHONE_NUMBER);
-        params.put("email",USER_EMAIL);
+        params.put("user_name", USER_NAME);
+        params.put("user_id", String.valueOf(myID));
+        params.put("phone_number", USER_PHONE_NUMBER);
+        params.put("email", USER_EMAIL);
+        params.put("file", new ByteArrayInputStream(encodedImage));
+        System.out.println(upload_url);
         AsyncHttpClient client = new AsyncHttpClient();
         client.post(upload_url, params, new AsyncHttpResponseHandler() {
             @Override
@@ -321,11 +357,12 @@ public class MainActivity extends Activity implements SigninFragent.SigninListen
 
     private void getNameFromID(Integer ID, M87NearEntry m87ne){
         RequestParams params = new RequestParams();
-        params.put("user_id",String.valueOf(ID));
+        params.put("user_id", String.valueOf(ID));
         AsyncHttpClient client = new AsyncHttpClient();
         String upload_url = "http://xchange-1132.appspot.com/request_name";
         client.post(upload_url, params, new AsyncHttpResponseHandler() {
             private M87NearEntry n;
+
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
                 try {
@@ -344,11 +381,11 @@ public class MainActivity extends Activity implements SigninFragent.SigninListen
                 //Toast.makeText(context, "Upload Unsuccessful", Toast.LENGTH_SHORT).show();
             }
 
-            private AsyncHttpResponseHandler init(M87NearEntry m87ne){
+            private AsyncHttpResponseHandler init(M87NearEntry m87ne) {
                 n = m87ne;
                 return this;
             }
-        }.init(m87ne) );
+        }.init(m87ne));
 
     }
 
@@ -387,7 +424,7 @@ public class MainActivity extends Activity implements SigninFragent.SigninListen
             public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
                 // Create fragment and give it an argument specifying the article it should show
                 mHistoryFragment = new HistoryFragment();
-
+                System.out.println("Switch to History");
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
                 // Replace whatever is in the fragment_container view with this fragment,
@@ -416,7 +453,8 @@ public class MainActivity extends Activity implements SigninFragent.SigninListen
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
                 // Replace whatever is in the fragment_container view with this fragment,
-                // and add the transaction to the back stack so the user can navigate back
+                // and add the transaction to the back stack so the user can navigate backt
+                //transaction.remove(mShowBusinessCard);
                 transaction.replace(R.id.fragment_container, mSearchFragment);
                 transaction.addToBackStack(null);
 
@@ -439,5 +477,15 @@ public class MainActivity extends Activity implements SigninFragent.SigninListen
         actionBar.addTab(actionBar.newTab().setText("Search").setTabListener(tabListenerSearch));
 
     }
+
+    @Override
+    public void onBCPressed(String name){
+        mShowBusinessCard = ShowBusinessCard.newInstance((name));
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, mShowBusinessCard);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
 }
 

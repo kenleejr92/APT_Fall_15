@@ -6,6 +6,7 @@ import android.content.ContentProviderResult;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -22,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +54,7 @@ import java.io.FileOutputStream;
 public class NearbyFragment extends Fragment {
     public static ArrayList<M87NameEntry> neighborList = new ArrayList<M87NameEntry>();
     public static ArrayAdapter neighborListAdapter;
+    public BCListener mBCListener;
     private ListView neighborListView;
     private Context context;
 
@@ -68,6 +71,7 @@ public class NearbyFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
+            mBCListener = (BCListener) activity;
             this.context = getActivity().getApplicationContext();
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -118,7 +122,7 @@ public class NearbyFragment extends Fragment {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             View rowView;
@@ -130,6 +134,9 @@ public class NearbyFragment extends Fragment {
             M87NameEntry n = (M87NameEntry) this.routingTable.get(position);
             Log.d("KHL", String.valueOf(n.id()));
             TextView id = (TextView) rowView.findViewById(R.id.device_id);
+            if(id!=null){
+                id.setText(n.name);
+            }
             Button addContacts = (Button) rowView.findViewById(R.id.add_contacts);
             addContacts.setOnClickListener(new View.OnClickListener() {
                 int position;
@@ -152,14 +159,25 @@ public class NearbyFragment extends Fragment {
                 }
             }.init(position));
 
-            if(id!=null){
-                id.setText(n.name);
-            }
+            ImageButton viewBC = (ImageButton) rowView.findViewById(R.id.xchange);
+            viewBC.setOnClickListener(new View.OnClickListener() {
+                int position;
+                @Override
+                public void onClick(View v) {
+                    M87NameEntry n = neighborList.get(position);
+                    mBCListener.onBCPressed(n.name);
+                }
+                private View.OnClickListener init(int pos) {
+                    position = pos;
+                    return this;
+                }
+            }.init(position));
+
             return rowView;
         }
     }
 
-    private void getContactsAndAdd(Integer ID) {
+    public void getContactsAndAdd(Integer ID) {
         RequestParams params = new RequestParams();
         params.put("user_id", String.valueOf(ID));
         AsyncHttpClient client = new AsyncHttpClient();
@@ -188,7 +206,6 @@ public class NearbyFragment extends Fragment {
 
             public void addToContacts(String displayName, String number, String email)
             {
-                Context contetx 	= context; //Application's context or Activity's context
                 String strDisplayName 	=  displayName; // Name of the Person to add
                 String strNumber 	=  number; //number of the person to add with the Contact
 

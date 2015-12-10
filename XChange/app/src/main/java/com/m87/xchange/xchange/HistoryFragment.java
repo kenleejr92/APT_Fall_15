@@ -30,6 +30,7 @@ public class HistoryFragment extends Fragment {
     private ListView historyListView;
     private Context context;
     public HistoryListener mHistoryListener;
+    public BCListener mBCListener;
 
     public static HistoryFragment newInstance(String param1, String param2) {
         HistoryFragment fragment = new HistoryFragment();
@@ -63,6 +64,7 @@ public class HistoryFragment extends Fragment {
         super.onAttach(activity);
         try {
             this.context = getActivity().getApplicationContext();
+            mBCListener = (BCListener) activity;
             mHistoryListener = (HistoryListener) activity;
             contactHistory = (ArrayList) MainActivity.databaseHandler.getAllContacts();
         } catch (ClassCastException e) {
@@ -98,9 +100,13 @@ public class HistoryFragment extends Fragment {
 
             Contact contact = (Contact) this.historyTable.get(position);
             TextView id = (TextView) rowView.findViewById(R.id.device_id);
+            if(id!=null){
+                id.setText(contact.getName());
+            }
             ImageButton callButton = (ImageButton) rowView.findViewById(R.id.call);
             ImageButton textButton = (ImageButton) rowView.findViewById(R.id.text);
             ImageButton emailButton = (ImageButton) rowView.findViewById(R.id.email);
+            ImageButton businessCard = (ImageButton) rowView.findViewById(R.id.view_bc);
             callButton.setOnClickListener(new View.OnClickListener() {
                 private Contact contact;
                 @Override
@@ -137,9 +143,19 @@ public class HistoryFragment extends Fragment {
                 }
             }.init(contact) );
 
-            if(id!=null){
-                id.setText(contact.getName());
-            }
+            businessCard.setOnClickListener(new View.OnClickListener() {
+                private Contact contact;
+                @Override
+                public void onClick(View v) {
+                    mBCListener.onBCPressed(contact.getName());
+                }
+                private View.OnClickListener init(Contact c){
+                    this.contact = c;
+                    return this;
+                }
+            }.init(contact) );
+
+
             return rowView;
         }
     }
