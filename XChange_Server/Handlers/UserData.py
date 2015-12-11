@@ -7,3 +7,4 @@ class User(ndb.Model):
   id = ndb.StringProperty()
   phone_number = ndb.StringProperty()
   email = ndb.StringProperty()
+  bc_url = ndb.StringProperty()
